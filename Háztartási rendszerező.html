@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Készlet PRO</title>
+    
+    <!-- PWA Meta adatok -->
+    <meta name="theme-color" content="#111827">
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/3081/3081931.png">
+    
+    <!-- Külső fájlok hivatkozása a telepítéshez -->
+    <link rel="manifest" href="manifest.json">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    
+    <style>
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        body { margin: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #0f172a; color: white; overflow-x: hidden; }
+        header { background: #111827; padding: 18px; text-align: center; font-size: 20px; font-weight: bold; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #374151; box-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+        
+        .container { padding: 12px; padding-bottom: 130px; max-width: 600px; margin: 0 auto; }
+        .card { background: #1f2937; padding: 16px; border-radius: 18px; margin-bottom: 14px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.3); }
+        
+        .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .dash-card { background: #111827; padding: 14px; border-radius: 14px; text-align: center; border: 1px solid #374151; }
+        
+        input, select { width: 100%; display: block; padding: 14px; margin: 8px 0; border: none; border-radius: 12px; background: #111827; color: white; font-size: 16px; border: 1px solid #4b5563; }
+        input:focus { border-color: #22c55e; }
+        
+        button { width: 100%; border: none; border-radius: 12px; padding: 14px; margin-top: 8px; background: #22c55e; color: black; font-weight: bold; font-size: 15px; cursor: pointer; transition: transform 0.1s; }
+        button:active { transform: scale(0.98); opacity: 0.8; }
+        
+        .small-btn { width: auto; padding: 8px 14px; font-size: 12px; margin-right: 6px; }
+        .page-btn { width: auto; padding: 10px 18px; margin-right: 8px; background: #374151; color: white; border-radius: 10px; }
+        .active-page { background: #22c55e; color: black; }
+        
+        .item { background: #111827; padding: 16px; border-radius: 16px; margin-bottom: 12px; position: relative; border-left: 6px solid transparent; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .exp-red { border-left-color: #ef4444; }
+        .exp-yellow { border-left-color: #facc15; }
+        .exp-green { border-left-color: #22c55e; }
+        
+        .navbar { position: fixed; bottom: 0; left: 0; right: 0; background: #111827; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #374151; z-index: 200; padding-bottom: calc(10px + env(safe-area-inset-bottom)); }
+        .navbtn { text-align: center; font-size: 11px; cursor: pointer; color: #94a3b8; width: 20%; transition: color 0.2s; }
+        .navbtn span { display: block; font-size: 22px; margin-bottom: 4px; }
+        .navbtn.active { color: #22c55e; }
+        
+        #reader { border-radius: 14px; overflow: hidden; margin-top: 10px; background: #000; min-height: 200px; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .danger-btn { background: #ef4444 !important; color: white; }
+        hr { border: 0; border-top: 1px solid #374151; margin: 20px 0; }
+    </style>
+</head>
+<body>
+
+<header id="headerTitle">🥦 Élelmiszer készlet</header>
+
+<div class="container">
+    
+    <!-- 1. KÉSZLET LAP -->
+    <div id="homeTab" class="tab-content active">
+        <div class="card">
+            <button id="foodPageBtn" class="page-btn active-page" onclick="setCategory('food')">🍽️ Konyha</button>
+            <button id="cleaningPageBtn" class="page-btn" onclick="setCategory('cleaning')">🧴 Tisztító</button>
+        </div>
+
+        <div class="card">
+            <h3 id="formTitle" style="margin-top:0">➕ Új tétel</h3>
+            <input id="name" placeholder="Termék neve">
+            <div style="display: flex; gap: 8px;">
+                <input id="pieces" type="number" placeholder="Aktuális db">
+                <input id="minPieces" type="number" placeholder="Vész-szint (db)">
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <input id="qty" type="number" placeholder="Kiszerelés">
+                <select id="unit">
+                    <option value="kg">kg</option>
+                    <option value="g">g</option>
+                    <option value="liter">liter</option>
+                    <option value="ml">ml</option>
+                    <option value="db">db</option>
+                </select>
+            </div>
+            <input id="expiry" type="date">
+            <select id="storage"></select>
+            <button onclick="addItem()" id="saveBtn">Mentés a listába</button>
+        </div>
+
+        <div class="card">
+            <h3>📷 Vonalkód beolvasás</h3>
+            <div id="reader"></div>
+            <button onclick="startScanner()" style="background: #3b82f6; color: white;">Scanner indítása</button>
+        </div>
+
+        <div class="card">
+            <h3>🔍 Keresés és Szűrés</h3>
+            <select id="storageFilter" onchange="render()"></select>
+            <input id="search" placeholder="Termék keresése..." oninput="render()">
+        </div>
+
+        <div id="list"></div>
+    </div>
+
+    <!-- 2. BEVÁSÁRLÓLISTA LAP -->
+    <div id="shopTab" class="tab-content">
+        <div class="card">
+            <h2>🛒 Szükséges tételek</h2>
+            <button onclick="copyShoppingList()" style="background:#facc15">📋 Lista másolása</button>
+            <div id="shoppingListContainer" style="margin-top:20px"></div>
+        </div>
+    </div>
+
+    <!-- 3. STATISZTIKA LAP -->
+    <div id="chartsTab" class="tab-content">
+        <div class="card">
+            <h3>📊 Dashboard</h3>
+            <div id="dashboard" class="dashboard-grid"></div>
+        </div>
+        <div class="card">
+            <canvas id="weightChart"></canvas>
+        </div>
+        <div class="card">
+            <canvas id="piecesChart"></canvas>
+        </div>
+    </div>
+
+    <!-- 4. BACKUP LAP -->
+    <div id="settingsTab" class="tab-content">
+        <div class="card">
+            <h2>💾 Adatmentés</h2>
+            <button onclick="exportData()" style="background: #3b82f6; color: white;">📂 Mentés fájlba (.json)</button>
+            <hr>
+            <h3>📥 Visszaállítás</h3>
+            <input type="file" id="importFile" accept=".json">
+            <button onclick="importData()" style="background: #eab308; color: black;">🔄 Adatok visszatöltése</button>
+            <hr>
+            <button onclick="clearAllData()" class="danger-btn">🗑️ MINDEN adat törlése</button>
+        </div>
+    </div>
+</div>
+
+<!-- ALSÓ NAVIGÁCIÓ -->
+<div class="navbar">
+    <div class="navbtn active" id="navHome" onclick="showTab('home')"><span>🏠</span>Készlet</div>
+    <div class="navbtn" id="navShop" onclick="showTab('shop')"><span>🛒</span>Lista</div>
+    <div class="navbtn" id="navCharts" onclick="showTab('charts')"><span>📈</span>Grafikon</div>
+    <div class="navbtn" id="navSettings" onclick="showTab('settings')"><span>💾</span>Backup</div>
+    <div class="navbtn" onclick="focusName()"><span>➕</span>Új</div>
+</div>
+
+<script>
+/* SERVICE WORKER REGISZTRÁCIÓ */
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').then(() => console.log("SW aktív"));
+}
+
+/* GLOBÁLIS VÁLTOZÓK */
+let currentPage = "food";
+let editIndex = null;
+let lastBarcode = null;
+let weightChart = null;
+let piecesChart = null;
+
+const storageOptions = {
+    food: ["🧊 Hűtő", "❄️ Fagyasztó", "🗄️ Szekrény", "🥫 Spájz"],
+    cleaning: ["🚽 Fürdő", "🍳 Konyha", "🧺 Mosó polc"]
+};
+
+let foodData = JSON.parse(localStorage.getItem("food")) || [];
+let cleaningData = JSON.parse(localStorage.getItem("cleaning")) || [];
+let barcodeDatabase = JSON.parse(localStorage.getItem("barcodeDatabase")) || {};
+
+/* ALAP FUNKCIÓK */
+function save() {
+    localStorage.setItem("food", JSON.stringify(foodData));
+    localStorage.setItem("cleaning", JSON.stringify(cleaningData));
+    localStorage.setItem("barcodeDatabase", JSON.stringify(barcodeDatabase));
+}
+
+function showTab(tab) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.getElementById(tab + 'Tab').classList.add('active');
+    document.querySelectorAll('.navbtn').forEach(el => el.classList.remove('active'));
+    const navBtn = document.getElementById('nav' + tab.charAt(0).toUpperCase() + tab.slice(1));
+    if(navBtn) navBtn.classList.add('active');
+    
+    if(tab === 'shop') renderShoppingList();
+    if(tab === 'charts') { renderDashboard(); setTimeout(renderAllCharts, 200); }
+}
+
+function setCategory(cat) {
+    currentPage = cat;
+    editIndex = null;
+    document.getElementById("foodPageBtn").classList.toggle("active-page", cat === 'food');
+    document.getElementById("cleaningPageBtn").classList.toggle("active-page", cat === 'cleaning');
+    document.getElementById("headerTitle").innerText = cat === 'food' ? "🥦 Élelmiszer készlet" : "🧴 Tisztító készlet";
+    updateStorageOptions();
+    render();
+}
+
+function updateStorageOptions() {
+    const s = document.getElementById("storage");
+    const f = document.getElementById("storageFilter");
+    s.innerHTML = "";
+    f.innerHTML = '<option value="">Összes tároló</option>';
+    storageOptions[currentPage].forEach(opt => {
+        s.innerHTML += `<option value="${opt}">${opt}</option>`;
+        f.innerHTML += `<option value="${opt}">${opt}</option>`;
+    });
+}
+
+function getBaseValue(qty, unit) {
+    const val = Number(qty);
+    if (unit === 'kg' || unit === 'liter') return val * 1000;
+    return val;
+}
+
+function formatSmart(qty, unit) {
+    if (unit === 'db') return qty + " db";
+    const base = getBaseValue(qty, unit);
+    const isWeight = (unit === 'kg' || unit === 'g');
+    if (base >= 1000) return (base / 1000).toFixed(1).replace(/\.0$/, '') + (isWeight ? " kg" : " L");
+    return base + (isWeight ? " g" : " ml");
+}
+
+function addItem() {
+    const name = document.getElementById("name").value.trim();
+    const pieces = Number(document.getElementById("pieces").value);
+    const minPieces = Number(document.getElementById("minPieces").value) || 0;
+    const qty = document.getElementById("qty").value;
+    const unit = document.getElementById("unit").value;
+    const storage = document.getElementById("storage").value;
+    const expiry = document.getElementById("expiry").value;
+
+    if (!name || isNaN(pieces)) return alert("Név és mennyiség kötelező!");
+
+    const item = { name, pieces, minPieces, qty, unit, storage, expiry };
+    const data = currentPage === "food" ? foodData : cleaningData;
+
+    if (editIndex !== null) { data[editIndex] = item; editIndex = null; }
+    else { data.push(item); }
+
+    if (lastBarcode) { barcodeDatabase[lastBarcode] = { name, qty, unit }; lastBarcode = null; }
+
+    save();
+    clearForm();
+    render();
+}
+
+function render() {
+    const data = currentPage === "food" ? foodData : cleaningData;
+    const list = document.getElementById("list");
+    const search = document.getElementById("search").value.toLowerCase();
+    const filter = document.getElementById("storageFilter").value;
+
+    list.innerHTML = "";
+    data.forEach((d, i) => {
+        if (d.name.toLowerCase().includes(search) && (filter === "" || d.storage === filter)) {
+            const diff = d.expiry ? (new Date(d.expiry) - new Date()) / (1000 * 60 * 60 * 24) : 100;
+            const expClass = diff < 0 ? "exp-red" : (diff <= 7 ? "exp-yellow" : "exp-green");
+            const isLow = Number(d.pieces) <= Number(d.minPieces);
+            
+            list.innerHTML += `
+                <div class="item ${expClass}" style="${isLow ? 'border-right: 6px solid #facc15;' : ''}">
+                    <div style="font-size: 17px; font-weight: bold; margin-bottom: 5px;">${d.name} ${isLow ? '⚠️' : ''}</div>
+                    <div style="font-size: 14px; color: #cbd5e1;">
+                        📦 ${d.pieces} db × ${d.qty} ${d.unit} (${formatSmart(d.qty * d.pieces, d.unit)})<br>
+                        📍 ${d.storage} | ⏳ Lejárat: ${d.expiry || "---"}
+                    </div>
+                    <div style="margin-top:12px; display: flex; gap: 8px;">
+                        <button class="small-btn" style="background:#3b82f6;color:white" onclick="editItem(${i})">Szerkesztés</button>
+                        <button class="small-btn" style="background:#ef4444;color:white" onclick="deleteItem(${i})">Törlés</button>
+                    </div>
+                </div>`;
+        }
+    });
+}
+
+function renderAllCharts() {
+    const data = currentPage === "food" ? foodData : cleaningData;
+    const stats = {};
+    data.forEach(d => {
+        if (!stats[d.storage]) stats[d.storage] = { weight: 0, volume: 0, totalPieces: 0 };
+        const totalBase = getBaseValue(d.qty, d.unit) * Number(d.pieces);
+        if (d.unit === 'kg' || d.unit === 'g') stats[d.storage].weight += totalBase;
+        else if (d.unit === 'liter' || d.unit === 'ml') stats[d.storage].volume += totalBase;
+        stats[d.storage].totalPieces += Number(d.pieces);
+    });
+    const labels = Object.keys(stats);
+
+    if (weightChart) weightChart.destroy();
+    weightChart = new Chart(document.getElementById("weightChart"), {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                { label: 'Súly (kg)', data: labels.map(l => (stats[l].weight/1000).toFixed(1)), backgroundColor: '#22c55e' },
+                { label: 'Folyadék (L)', data: labels.map(l => (stats[l].volume/1000).toFixed(1)), backgroundColor: '#3b82f6' }
+            ]
+        },
+        options: { responsive: true, plugins: { legend: { labels: { color: 'white' } } }, scales: { y: { ticks: { color: 'white' } }, x: { ticks: { color: 'white' } } } }
+    });
+
+    if (piecesChart) piecesChart.destroy();
+    piecesChart = new Chart(document.getElementById("piecesChart"), {
+        type: 'doughnut',
+        data: {
+            labels: labels,
+            datasets: [{ data: labels.map(l => stats[l].totalPieces), backgroundColor: ['#facc15', '#ef4444', '#3b82f6', '#22c55e', '#a855f7'] }]
+        },
+        options: { responsive: true, plugins: { legend: { labels: { color: 'white' }, position: 'bottom' } } }
+    });
+}
+
+function renderShoppingList() {
+    const container = document.getElementById("shoppingListContainer");
+    container.innerHTML = "";
+    const all = [...foodData, ...cleaningData];
+    const toBuy = all.filter(d => Number(d.pieces) <= Number(d.minPieces));
+    if (!toBuy.length) { container.innerHTML = "<p style='text-align:center; padding:20px; color:#94a3b8;'>Minden készleten! 🎉</p>"; return; }
+    toBuy.forEach(i => {
+        container.innerHTML += `<div style="display:flex; justify-content:space-between; align-items:center; padding:12px; border-bottom:1px solid #374151">
+            <span><b>${i.name}</b><br><small style="color:#94a3b8">${i.pieces} db van / ${i.minPieces} szükséges</small></span>
+            <span style="font-size:20px">🛒</span>
+        </div>`;
+    });
+}
+
+function copyShoppingList() {
+    const all = [...foodData, ...cleaningData];
+    const toBuy = all.filter(d => Number(d.pieces) <= Number(d.minPieces));
+    if(!toBuy.length) return alert("Üres lista.");
+    const text = "🛒 BEVÁSÁRLÓLISTA:\n" + toBuy.map(i => `- ${i.name} (jelenleg: ${i.pieces} db)`).join("\n");
+    navigator.clipboard.writeText(text);
+    alert("Lista a vágólapra másolva!");
+}
+
+function renderDashboard() {
+    const data = currentPage === "food" ? foodData : cleaningData;
+    const sum = {};
+    data.forEach(d => sum[d.storage] = (sum[d.storage] || 0) + Number(d.pieces));
+    const dash = document.getElementById("dashboard");
+    dash.innerHTML = "";
+    for (let s in sum) dash.innerHTML += `<div class="dash-card"><b>${s}</b><br>${sum[s]} db termék</div>`;
+}
+
+function exportData() {
+    const backup = { food: foodData, cleaning: cleaningData, barcodes: barcodeDatabase, date: new Date().toISOString() };
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `haztartas_backup_${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+}
+
+function importData() {
+    const file = document.getElementById("importFile").files[0];
+    if (!file) return alert("Válassz ki egy fájlt!");
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        try {
+            const data = JSON.parse(e.target.result);
+            if (confirm("Figyelem! Ez felülírja a jelenlegi adatokat. Folytatod?")) {
+                foodData = data.food || [];
+                cleaningData = data.cleaning || [];
+                barcodeDatabase = data.barcodes || {};
+                save(); render(); alert("Adatok sikeresen visszaállítva!");
+            }
+        } catch(err) { alert("Hibás fájlformátum!"); }
+    };
+    reader.readAsText(file);
+}
+
+function clearAllData() { if(confirm("BIZTOS? Minden adat véglegesen törlődik!")) { localStorage.clear(); location.reload(); } }
+
+function deleteItem(i) { if(confirm("Törlöd ezt a tételt?")) { if(currentPage==="food") foodData.splice(i,1); else cleaningData.splice(i,1); save(); render(); } }
+
+function editItem(i) {
+    const d = (currentPage === "food" ? foodData : cleaningData)[i];
+    document.getElementById("name").value = d.name;
+    document.getElementById("pieces").value = d.pieces;
+    document.getElementById("minPieces").value = d.minPieces;
+    document.getElementById("qty").value = d.qty;
+    document.getElementById("unit").value = d.unit;
+    document.getElementById("storage").value = d.storage;
+    document.getElementById("expiry").value = d.expiry;
+    editIndex = i;
+    showTab('home');
+    window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function clearForm() {
+    document.getElementById("name").value = "";
+    document.getElementById("pieces").value = "";
+    document.getElementById("minPieces").value = "";
+    document.getElementById("qty").value = "";
+    document.getElementById("expiry").value = "";
+    editIndex = null;
+}
+
+function focusName() { showTab('home'); window.scrollTo(0,0); document.getElementById("name").focus(); }
+
+let html5QrCode = new Html5Qrcode("reader");
+function startScanner() {
+    html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (text) => {
+        html5QrCode.stop();
+        if (barcodeDatabase[text]) {
+            const item = barcodeDatabase[text];
+            document.getElementById("name").value = item.name;
+            document.getElementById("qty").value = item.qty;
+            document.getElementById("unit").value = item.unit;
+            alert("Termék felismerve: " + item.name);
+        } else { lastBarcode = text; alert("Új vonalkód! Mentéskor hozzárendeljük a termékhez."); }
+    }).catch(err => alert("Kamera hiba: " + err));
+}
+
+/* INDÍTÁS */
+updateStorageOptions();
+render();
+</script>
+</body>
+</html>

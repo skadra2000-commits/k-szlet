@@ -230,48 +230,55 @@ function formatSmart(qty, unit) {
 
 function addItem() {
     const name = document.getElementById("name").value.trim();
-    const pieces = document.getElementById("pieces").value;
-    const minPieces = document.getElementById("minPieces").value || 0;
+    const pieces = Number(document.getElementById("pieces").value);
+    const minPieces = Number(document.getElementById("minPieces").value) || 0;
     const qty = document.getElementById("qty").value;
     const unit = document.getElementById("unit").value;
     const storage = document.getElementById("storage").value;
     const expiry = document.getElementById("expiry").value;
 
-    if (name === "" || pieces === "") {
-        alert("Kérlek írd be a nevet és a darabszámot!");
+    if (name === "" || isNaN(pieces)) {
+        alert("Név és darabszám megadása kötelező!");
         return;
     }
 
-    const item = { 
-        name, 
-        pieces: Number(pieces), 
-        minPieces: Number(minPieces), 
-        qty, 
-        unit, 
-        storage, 
-        expiry 
-    };
-
     const data = (currentPage === "food") ? foodData : cleaningData;
 
+    // --- ÖSSZEVONÁSI LOGIKA INDÍTÁSA ---
+    // Megnézzük, van-e már ilyen nevű termék UGYANABBAN a tárolóban
+    let existingItem = data.find(item => 
+        item.name.toLowerCase() === name.toLowerCase() && 
+        item.storage === storage
+    );
+
     if (editIndex !== null) {
-        data[editIndex] = item;
+        // Ha épp szerkesztünk egy elemet, akkor csak frissítjük
+        data[editIndex] = { name, pieces, minPieces, qty, unit, storage, expiry };
         editIndex = null;
         document.getElementById("saveBtn").innerText = "Mentés a listába";
+    } else if (existingItem) {
+        // HA MÁR LÉTEZIK: Összeadjuk a darabszámot
+        existingItem.pieces += pieces;
+        // Opcionális: a lejárati dátumot frissítsük a legújabbra, ha az új tétel hamarabb jár le
+        if (expiry && (!existingItem.expiry || expiry < existingItem.expiry)) {
+            existingItem.expiry = expiry;
+        }
+        alert(`Összevonva: ${name} új mennyisége: ${existingItem.pieces} db`);
     } else {
-        data.push(item);
+        // HA ÚJ: Hozzáadjuk a listához
+        data.push({ name, pieces, minPieces, qty, unit, storage, expiry });
     }
+    // --- ÖSSZEVONÁSI LOGIKA VÉGE ---
 
-    // Ha volt beolvasott vonalkód, elmentjük az adatbázisba is
+    // Vonalkód mentése az adatbázisba (ha scenneltünk)
     if (lastBarcode) {
         barcodeDatabase[lastBarcode] = { name, qty, unit };
         lastBarcode = null;
     }
 
-    save();      // Mentés a telefon memóriájába
-    clearForm(); // Mezők ürítése
-    render();    // Lista újrarajzolása a képernyőn
-    alert("Sikeresen hozzáadva!");
+    save();      // Mentés localStorage-ba
+    clearForm(); // Form törlése
+    render();    // Lista frissítése
 }
 
 function render() {

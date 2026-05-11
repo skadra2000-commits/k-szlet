@@ -41,7 +41,6 @@
         .exp-yellow { border-left-color: #facc15; }
         .exp-green { border-left-color: #22c55e; }
 
-        /* CHAT BUBORÉK STÍLUSOK */
         .chat-container { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
         .bubble { max-width: 85%; padding: 12px 16px; border-radius: 20px; position: relative; line-height: 1.4; animation: pop 0.2s ease; }
         @keyframes pop { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
@@ -52,7 +51,7 @@
         .bubble-time { font-size: 10px; opacity: 0.6; margin-top: 5px; text-align: right; }
         
         .navbar { position: fixed; bottom: 0; left: 0; right: 0; background: #111827; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #374151; z-index: 200; padding-bottom: calc(10px + env(safe-area-inset-bottom)); }
-        .navbtn { text-align: center; font-size: 11px; cursor: pointer; color: #94a3b8; width: 20%; transition: color 0.2s; }
+        .navbtn { text-align: center; font-size: 11px; cursor: pointer; color: #94a3b8; width: 16%; transition: color 0.2s; }
         .navbtn span { display: block; font-size: 22px; margin-bottom: 4px; }
         .navbtn.active { color: #22c55e; }
         
@@ -121,6 +120,14 @@
         </div>
     </div>
 
+    <div id="boltTab" class="tab-content">
+        <div class="card">
+            <h2>🏪 Termék Adatbázis</h2>
+            <p style="font-size: 13px; color: #94a3b8;">Itt csak azokat a termékeket látod, amikhez már mentettél vonalkódot.</p>
+            <div id="boltListContainer"></div>
+        </div>
+    </div>
+
     <div id="chartsTab" class="tab-content">
         <div class="card">
             <h3>📊 Dashboard</h3>
@@ -140,7 +147,7 @@
             <label style="font-size: 12px; color: #94a3b8;">Ki küldi?</label>
             <select id="userSelect" onchange="localStorage.setItem('lastUser', this.value); renderNotes();">
                 <option value="Fanni">🌸 Fanni</option>
-                <option value="Laci">🎸 Laci</option>
+                <option value="Laci">🧔 Laci</option>
             </select>
             <textarea id="noteText" placeholder="Írj valamit a többieknek..."></textarea>
             <button onclick="addNote()" style="background: #a855f7; color: white;">Küldés</button>
@@ -165,6 +172,7 @@
 <div class="navbar">
     <div class="navbtn active" id="navHome" onclick="showTab('home')"><span>🏠</span>Készlet</div>
     <div class="navbtn" id="navShop" onclick="showTab('shop')"><span>🛒</span>Lista</div>
+    <div class="navbtn" id="navBolt" onclick="showTab('bolt')"><span>🏪</span>Bolt</div>
     <div class="navbtn" id="navCharts" onclick="showTab('charts')"><span>📈</span>Grafikon</div>
     <div class="navbtn" id="navNotes" onclick="showTab('notes')"><span>💬</span>Chat</div>
     <div class="navbtn" id="navSettings" onclick="showTab('settings')"><span>💾</span>Backup</div>
@@ -188,7 +196,7 @@ let notesData = JSON.parse(localStorage.getItem("notes")) || [];
 let cleaningData = JSON.parse(localStorage.getItem("cleaning")) || [];
 let barcodeDatabase = JSON.parse(localStorage.getItem("barcodeDatabase")) || {};
 
-document.getElementById("userSelect").value = localStorage.getItem("lastUser") || "Anya";
+document.getElementById("userSelect").value = localStorage.getItem("lastUser") || "Fanni";
 
 function save() {
     localStorage.setItem("food", JSON.stringify(foodData));
@@ -205,8 +213,72 @@ function showTab(tab) {
     if(navBtn) navBtn.classList.add('active');
     
     if(tab === 'shop') renderShoppingList();
+    if(tab === 'bolt') renderBolt();
     if(tab === 'charts') { renderDashboard(); setTimeout(renderAllCharts, 200); }
     if(tab === 'notes') renderNotes();
+}
+
+/* BOLT / ADATBÁZIS - CSAK VONALKÓDOS TERMÉKEK */
+function renderBolt() {
+    const container = document.getElementById("boltListContainer");
+    container.innerHTML = "";
+    
+    // Itt a szűrés: Csak a vonalkód adatbázisból (barcodeDatabase) vesszük a neveket
+    let scanneredProducts = new Set();
+    Object.values(barcodeDatabase).forEach(i => scanneredProducts.add(i.name));
+
+    if(scanneredProducts.size === 0) {
+        container.innerHTML = "<p style='text-align:center; padding:20px; color:#94a3b8;'>Még nincsenek beszkennelt termékek.</p>";
+        return;
+    }
+
+    scanneredProducts.forEach(prodName => {
+        // Megkeressük a vonalkódos infót az alapértelmezett értékekhez
+        const barcodeInfo = Object.values(barcodeDatabase).find(b => b.name === prodName);
+        
+        container.innerHTML += `
+            <div class="item" style="display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                    <div style="font-weight:bold">${prodName}</div>
+                    <small style="color:#94a3b8">${barcodeInfo.qty} ${barcodeInfo.unit}</small>
+                </div>
+                <button class="small-btn" id="bolt-btn-${prodName.replace(/\s/g, '')}" onclick="quickAddToShop('${prodName}')" style="background:#facc15; color:black; margin:0">🛒 Listára</button>
+            </div>`;
+    });
+}
+
+function quickAddToShop(name) {
+    let item = [...foodData, ...cleaningData].find(i => i.name.toLowerCase() === name.toLowerCase());
+    
+    // Megkeressük az adatbázisban a mentett egységeket
+    const info = Object.values(barcodeDatabase).find(b => b.name === name) || {qty:1, unit:"db"};
+
+    if (item) {
+        item.minPieces = Math.max(Number(item.minPieces), Number(item.pieces) + 1);
+    } else {
+        foodData.push({
+            name: name,
+            pieces: 0,
+            minPieces: 1,
+            qty: info.qty,
+            unit: info.unit,
+            storage: storageOptions.food[0],
+            expiry: ""
+        });
+    }
+    
+    save();
+    
+    const btn = document.getElementById(`bolt-btn-${name.replace(/\s/g, '')}`);
+    if(btn) {
+        const oldText = btn.innerText;
+        btn.innerText = "Hozzáadva ✅";
+        btn.style.background = "#22c55e";
+        setTimeout(() => {
+            btn.innerText = oldText;
+            btn.style.background = "#facc15";
+        }, 1000);
+    }
 }
 
 /* CHAT FUNKCIÓK */
@@ -214,10 +286,8 @@ function addNote() {
     const text = document.getElementById("noteText").value.trim();
     const user = document.getElementById("userSelect").value;
     if(!text) return;
-    
     const now = new Date();
     const time = now.getHours() + ":" + now.getMinutes().toString().padStart(2, '0');
-    
     notesData.unshift({ text, user, time });
     save();
     document.getElementById("noteText").value = "";
@@ -322,7 +392,7 @@ function render() {
         if (d.name.toLowerCase().includes(search) && (filter === "" || d.storage === filter)) {
             const diff = d.expiry ? (new Date(d.expiry) - new Date()) / (1000 * 60 * 60 * 24) : 100;
             const expClass = diff < 0 ? "exp-red" : (diff <= 7 ? "exp-yellow" : "exp-green");
-            const isLow = Number(d.pieces) <= Number(d.minPieces);
+            const isLow = Number(d.pieces) <= Number(d.minPieces) && Number(d.minPieces) > 0;
             
             list.innerHTML += `
                 <div class="item ${expClass}" style="${isLow ? 'border-right: 6px solid #facc15;' : ''}">
@@ -412,7 +482,8 @@ function renderShoppingList() {
     const container = document.getElementById("shoppingListContainer");
     container.innerHTML = "";
     const all = [...foodData, ...cleaningData];
-    const toBuy = all.filter(d => Number(d.pieces) <= Number(d.minPieces));
+    const toBuy = all.filter(d => Number(d.pieces) <= Number(d.minPieces) && Number(d.minPieces) > 0);
+    
     if (!toBuy.length) { container.innerHTML = "<p style='text-align:center; color:#94a3b8;'>Minden készleten! 🎉</p>"; return; }
     toBuy.forEach(i => {
         container.innerHTML += `<div style="display:flex; justify-content:space-between; align-items:center; padding:12px; border-bottom:1px solid #374151">
@@ -424,9 +495,9 @@ function renderShoppingList() {
 
 function copyShoppingList() {
     const all = [...foodData, ...cleaningData];
-    const toBuy = all.filter(d => Number(d.pieces) <= Number(d.minPieces));
+    const toBuy = all.filter(d => Number(d.pieces) <= Number(d.minPieces) && Number(d.minPieces) > 0);
     if(!toBuy.length) return alert("Üres.");
-    const text = "🛒 LISTA:\n" + toBuy.map(i => `- ${i.name} (${i.pieces} db)`).join("\n");
+    const text = "🛒 LISTA:\n" + toBuy.map(i => `- ${i.name} (${i.pieces} db van)`).join("\n");
     navigator.clipboard.writeText(text); alert("Másolva!");
 }
 

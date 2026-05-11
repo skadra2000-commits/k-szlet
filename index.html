@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Készlet PRO + Képek</title>
+    <title>Készlet PRO - Komplett</title>
     
     <meta name="theme-color" content="#111827">
     <meta name="mobile-web-app-capable" content="yes">
@@ -14,46 +14,49 @@
     
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        body { margin: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #0f172a; color: white; overflow-x: hidden; }
-        header { background: #111827; padding: 18px; text-align: center; font-size: 20px; font-weight: bold; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #374151; box-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+        body { margin: 0; font-family: 'Segoe UI', Roboto, sans-serif; background: #0f172a; color: white; overflow-x: hidden; }
+        header { background: #111827; padding: 18px; text-align: center; font-size: 20px; font-weight: bold; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #374151; }
         
         .container { padding: 12px; padding-bottom: 130px; max-width: 600px; margin: 0 auto; }
-        .card { background: #1f2937; padding: 16px; border-radius: 18px; margin-bottom: 14px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.3); }
+        .card { background: #1f2937; padding: 16px; border-radius: 18px; margin-bottom: 14px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
         
-        input, select, textarea { width: 100%; display: block; padding: 14px; margin: 8px 0; border: none; border-radius: 12px; background: #111827; color: white; font-size: 16px; border: 1px solid #4b5563; }
+        input, select, textarea { width: 100%; display: block; padding: 14px; margin: 8px 0; border: 1px solid #4b5563; border-radius: 12px; background: #111827; color: white; font-size: 16px; }
+        button { width: 100%; border: none; border-radius: 12px; padding: 14px; margin-top: 8px; background: #22c55e; color: black; font-weight: bold; cursor: pointer; transition: 0.1s; }
+        button:active { transform: scale(0.98); }
         
-        button { width: 100%; border: none; border-radius: 12px; padding: 14px; margin-top: 8px; background: #22c55e; color: black; font-weight: bold; cursor: pointer; }
-        
-        .item { background: #111827; padding: 14px; border-radius: 16px; margin-bottom: 12px; border-left: 6px solid transparent; display: flex; align-items: center; gap: 12px; }
-        
-        /* KÉP STÍLUS */
-        .prod-img { width: 50px; height: 50px; border-radius: 10px; object-fit: cover; background: #374151; flex-shrink: 0; border: 1px solid #4b5563; }
+        .item { background: #111827; padding: 14px; border-radius: 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 12px; border-left: 5px solid #22c55e; }
+        .prod-img { width: 50px; height: 50px; border-radius: 10px; object-fit: cover; background: #374151; flex-shrink: 0; }
         .item-info { flex-grow: 1; }
 
         .navbar { position: fixed; bottom: 0; left: 0; right: 0; background: #111827; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #374151; z-index: 200; padding-bottom: calc(10px + env(safe-area-inset-bottom)); }
-        .navbtn { text-align: center; font-size: 11px; color: #94a3b8; width: 16%; }
+        .navbtn { text-align: center; font-size: 11px; color: #94a3b8; width: 16%; cursor: pointer; }
         .navbtn span { display: block; font-size: 22px; margin-bottom: 4px; }
         .navbtn.active { color: #22c55e; }
         
-        #reader { border-radius: 14px; overflow: hidden; margin-top: 10px; background: #000; }
+        #reader { border-radius: 14px; overflow: hidden; margin: 10px 0; background: #000; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-        .small-btn { width: auto; padding: 8px 14px; font-size: 12px; }
+        .small-btn { width: auto; padding: 8px 14px; font-size: 12px; margin: 0; }
         .page-btn { width: auto; padding: 10px 18px; margin-right: 8px; background: #374151; color: white; border-radius: 10px; }
         .active-page { background: #22c55e; color: black; }
-        .danger-btn { background: #ef4444 !important; color: white; }
+        
+        .bubble { padding: 12px; border-radius: 15px; margin-bottom: 10px; max-width: 85%; }
+        .bubble.me { background: #22c55e; color: black; align-self: flex-end; margin-left: auto; }
+        .bubble.other { background: #374151; color: white; }
+        .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .dash-card { background: #111827; padding: 12px; border-radius: 12px; text-align: center; border: 1px solid #374151; }
     </style>
 </head>
 <body>
 
-<header id="headerTitle">🥦 Élelmiszer</header>
+<header id="headerTitle">🥦 Készlet</header>
 
 <div class="container">
     
     <div id="homeTab" class="tab-content active">
         <div class="card">
-            <button id="foodPageBtn" class="page-btn active-page" onclick="setCategory('food')">🍽️ Konyha</button>
-            <button id="cleaningPageBtn" class="page-btn" onclick="setCategory('cleaning')">🧴 Tisztító</button>
+            <button id="foodBtn" class="page-btn active-page" onclick="setCategory('food')">🍽️ Konyha</button>
+            <button id="cleanBtn" class="page-btn" onclick="setCategory('cleaning')">🧴 Tisztító</button>
         </div>
 
         <div class="card">
@@ -66,13 +69,13 @@
                 <input id="qty" type="number" placeholder="Kiszerelés">
                 <select id="unit"><option value="kg">kg</option><option value="g">g</option><option value="liter">liter</option><option value="ml">ml</option><option value="db">db</option></select>
             </div>
-            <input id="imgUrl" placeholder="Kép URL (opcionális)">
+            <input id="imgUrl" placeholder="Kép URL link (opcionális)">
             <select id="storage"></select>
-            <button onclick="addItem()" id="saveBtn">Mentés</button>
+            <button onclick="addItem()" id="saveBtn">Mentés a listába</button>
         </div>
 
         <div class="card">
-            <h3>📷 Vonalkód beolvasás</h3>
+            <h3>📷 Beolvasás</h3>
             <div id="reader"></div>
             <button onclick="startScanner()" style="background: #3b82f6; color: white;">Scanner indítása</button>
         </div>
@@ -82,15 +85,43 @@
 
     <div id="shopTab" class="tab-content">
         <div class="card">
-            <h2>🛒 Bevásárlólista</h2>
+            <h2>🛒 Szükséges tételek</h2>
+            <button onclick="copyShoppingList()" style="background:#facc15; margin-bottom:15px">📋 Lista másolása</button>
             <div id="shoppingListContainer"></div>
         </div>
     </div>
 
     <div id="boltTab" class="tab-content">
         <div class="card">
-            <h2>🏪 Bolt</h2>
+            <h2>🏪 Termék Adatbázis</h2>
             <div id="boltListContainer"></div>
+        </div>
+    </div>
+
+    <div id="chartsTab" class="tab-content">
+        <div class="card"><div id="dashboard" class="dashboard-grid"></div></div>
+        <div class="card"><canvas id="piecesChart"></canvas></div>
+    </div>
+
+    <div id="notesTab" class="tab-content">
+        <div class="card">
+            <select id="userSelect" onchange="localStorage.setItem('lastUser', this.value); renderNotes();">
+                <option value="Fanni">🌸 Fanni</option>
+                <option value="Laci">🧔 Laci</option>
+            </select>
+            <textarea id="noteText" placeholder="Üzenet..."></textarea>
+            <button onclick="addNote()" style="background: #a855f7; color: white;">Küldés</button>
+        </div>
+        <div id="notesList" style="display: flex; flex-direction: column;"></div>
+    </div>
+
+    <div id="settingsTab" class="tab-content">
+        <div class="card">
+            <button onclick="exportData()" style="background: #3b82f6; color: white;">📂 Adatok mentése fájlba</button>
+            <hr style="border: 1px solid #374151; margin: 20px 0;">
+            <input type="file" id="importFile" accept=".json">
+            <button onclick="importData()" style="background: #eab308; color: black;">🔄 Visszatöltés</button>
+            <button onclick="clearAllData()" style="background:#ef4444; color:white; margin-top:30px">🗑️ MINDEN TÖRLÉSE</button>
         </div>
     </div>
 </div>
@@ -99,15 +130,20 @@
     <div class="navbtn active" id="navHome" onclick="showTab('home')"><span>🏠</span>Készlet</div>
     <div class="navbtn" id="navShop" onclick="showTab('shop')"><span>🛒</span>Lista</div>
     <div class="navbtn" id="navBolt" onclick="showTab('bolt')"><span>🏪</span>Bolt</div>
+    <div class="navbtn" id="navCharts" onclick="showTab('charts')"><span>📈</span>Graf</div>
+    <div class="navbtn" id="navNotes" onclick="showTab('notes')"><span>💬</span>Chat</div>
+    <div class="navbtn" id="navSettings" onclick="showTab('settings')"><span>💾</span>Vissza</div>
 </div>
 
 <script>
 let currentPage = "food";
 let editIndex = null;
 let lastBarcode = null;
+let piecesChart = null;
 
 let foodData = JSON.parse(localStorage.getItem("food")) || [];
 let cleaningData = JSON.parse(localStorage.getItem("cleaning")) || [];
+let notesData = JSON.parse(localStorage.getItem("notes")) || [];
 let barcodeDatabase = JSON.parse(localStorage.getItem("barcodeDatabase")) || {};
 
 const storageOptions = {
@@ -118,6 +154,7 @@ const storageOptions = {
 function save() {
     localStorage.setItem("food", JSON.stringify(foodData));
     localStorage.setItem("cleaning", JSON.stringify(cleaningData));
+    localStorage.setItem("notes", JSON.stringify(notesData));
     localStorage.setItem("barcodeDatabase", JSON.stringify(barcodeDatabase));
 }
 
@@ -126,33 +163,29 @@ function showTab(tab) {
     document.getElementById(tab + 'Tab').classList.add('active');
     document.querySelectorAll('.navbtn').forEach(el => el.classList.remove('active'));
     document.getElementById('nav' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+    
     if(tab === 'shop') renderShoppingList();
     if(tab === 'bolt') renderBolt();
+    if(tab === 'charts') { renderDashboard(); setTimeout(renderCharts, 200); }
+    if(tab === 'notes') renderNotes();
 }
 
 /* BOLT RENDER KÉPPEL */
 function renderBolt() {
     const container = document.getElementById("boltListContainer");
     container.innerHTML = "";
-    
-    // Egyedi terméknevek kigyűjtése a barcode adatbázisból
     let products = [];
     let seen = new Set();
     Object.values(barcodeDatabase).forEach(b => {
-        if(!seen.has(b.name)) {
-            products.push(b);
-            seen.add(b.name);
-        }
+        if(!seen.has(b.name)) { products.push(b); seen.add(b.name); }
     });
 
     products.forEach(p => {
-        const imgHtml = p.img ? `<img src="${p.img}" class="prod-img">` : `<div class="prod-img" style="display:flex;align-items:center;justify-content:center;font-size:20px">📦</div>`;
+        const imgHtml = p.img ? `<img src="${p.img}" class="prod-img">` : `<div class="prod-img" style="display:flex;align-items:center;justify-content:center;background:#374151">📦</div>`;
         container.innerHTML += `
             <div class="item">
                 ${imgHtml}
-                <div class="item-info">
-                    <b>${p.name}</b><br><small>${p.qty} ${p.unit}</small>
-                </div>
+                <div class="item-info"><b>${p.name}</b><br><small>${p.qty} ${p.unit}</small></div>
                 <button class="small-btn" onclick="quickAddToShop('${p.name}')" style="background:#facc15">🛒</button>
             </div>`;
     });
@@ -167,29 +200,22 @@ function quickAddToShop(name) {
         const dbInfo = Object.values(barcodeDatabase).find(b => b.name === name);
         foodData.push({ name, pieces: 0, minPieces: 1, qty: dbInfo.qty, unit: dbInfo.unit, storage: storageOptions.food[0], expiry: "" });
     }
-    save();
-    alert("Hozzáadva a bevásárlólistához!");
+    save(); alert("Listára került!");
 }
 
-/* KÉSZLET RENDER KÉPPEL */
+/* KÉSZLET RENDER KÉPPEL (Csak ha > 0) */
 function render() {
     const data = currentPage === "food" ? foodData : cleaningData;
     const list = document.getElementById("list");
     list.innerHTML = "";
-
     data.forEach((d, i) => {
         if (Number(d.pieces) > 0 || editIndex === i) {
-            // Megkeressük, van-e kép a barcode adatbázisban ehhez a névhez
             const dbEntry = Object.values(barcodeDatabase).find(b => b.name.toLowerCase() === d.name.toLowerCase());
-            const imgHtml = (dbEntry && dbEntry.img) ? `<img src="${dbEntry.img}" class="prod-img">` : `<div class="prod-img" style="display:flex;align-items:center;justify-content:center;font-size:20px">📦</div>`;
-
+            const imgHtml = (dbEntry && dbEntry.img) ? `<img src="${dbEntry.img}" class="prod-img">` : `<div class="prod-img" style="display:flex;align-items:center;justify-content:center;background:#374151">📦</div>`;
             list.innerHTML += `
                 <div class="item">
                     ${imgHtml}
-                    <div class="item-info">
-                        <b>${d.name}</b><br>
-                        <small>${d.pieces} db | ${d.storage}</small>
-                    </div>
+                    <div class="item-info"><b>${d.name}</b><br><small>${d.pieces} db | ${d.storage}</small></div>
                     <div style="display:flex;gap:5px">
                         <button class="small-btn" onclick="editItem(${i})">✏️</button>
                         <button class="small-btn" style="background:#ef4444;color:white" onclick="deleteItem(${i})">🗑️</button>
@@ -199,16 +225,42 @@ function render() {
     });
 }
 
+/* BEVÁSÁRLÓLISTA TÖRLÉSSEL */
+function renderShoppingList() {
+    const container = document.getElementById("shoppingListContainer");
+    container.innerHTML = "";
+    const all = [
+        ...foodData.map((it, idx) => ({ ...it, origin: 'food', idx })),
+        ...cleaningData.map((it, idx) => ({ ...it, origin: 'cleaning', idx }))
+    ].filter(d => Number(d.pieces) <= Number(d.minPieces) && Number(d.minPieces) > 0);
+
+    if(!all.length) { container.innerHTML = "<p style='text-align:center;color:#94a3b8'>Minden készleten! 🎉</p>"; return; }
+
+    all.forEach(i => {
+        container.innerHTML += `
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:12px;border-bottom:1px solid #374151">
+                <span><b>${i.name}</b><br><small>${i.pieces} van / ${i.minPieces} kell</small></span>
+                <button class="small-btn" onclick="removeFromShopList('${i.origin}', ${i.idx})" style="background:#ef4444;color:white">🗑️</button>
+            </div>`;
+    });
+}
+
+function removeFromShopList(origin, idx) {
+    if(origin === 'food') foodData[idx].minPieces = 0; else cleaningData[idx].minPieces = 0;
+    save(); renderShoppingList();
+}
+
+/* ALAP FUNKCIÓK */
 function addItem() {
     const name = document.getElementById("name").value.trim();
-    const pieces = Number(document.getElementById("pieces").value);
+    const pieces = Number(document.getElementById("pieces").value) || 0;
     const minPieces = Number(document.getElementById("minPieces").value) || 0;
     const qty = document.getElementById("qty").value;
     const unit = document.getElementById("unit").value;
     const storage = document.getElementById("storage").value;
     const img = document.getElementById("imgUrl").value.trim();
 
-    if (!name) return alert("Név kötelező!");
+    if (!name) return alert("Név kell!");
     const data = (currentPage === "food") ? foodData : cleaningData;
 
     if (editIndex !== null) {
@@ -217,14 +269,33 @@ function addItem() {
         data.push({ name, pieces, minPieces, qty, unit, storage });
     }
 
-    // Ha van vonalkód folyamatban, vagy csak frissíteni akarjuk a globális adatbázis képét
     if (lastBarcode || img) {
-        const code = lastBarcode || Date.now(); // Ha nincs barcode, egyedi azonosító
-        barcodeDatabase[code] = { name, qty, unit, img };
+        const code = lastBarcode || name;
+        barcodeDatabase[code] = { name, qty, unit, img: img || (barcodeDatabase[code] ? barcodeDatabase[code].img : "") };
         lastBarcode = null;
     }
 
     save(); clearForm(); render();
+}
+
+function editItem(i) {
+    const d = (currentPage === "food" ? foodData : cleaningData)[i];
+    document.getElementById("name").value = d.name;
+    document.getElementById("pieces").value = d.pieces;
+    document.getElementById("minPieces").value = d.minPieces;
+    document.getElementById("qty").value = d.qty;
+    document.getElementById("unit").value = d.unit;
+    document.getElementById("storage").value = d.storage;
+    editIndex = i;
+    document.getElementById("saveBtn").innerText = "Módosítás mentése";
+    window.scrollTo(0,0);
+}
+
+function deleteItem(i) { 
+    if(confirm("Törlöd?")) { 
+        if(currentPage==="food") foodData.splice(i,1); else cleaningData.splice(i,1); 
+        save(); render(); 
+    } 
 }
 
 function startScanner() {
@@ -237,52 +308,15 @@ function startScanner() {
             document.getElementById("qty").value = item.qty;
             document.getElementById("unit").value = item.unit;
             document.getElementById("imgUrl").value = item.img || "";
-            alert("Ismert termék: " + item.name);
-        } else {
-            lastBarcode = text;
-            alert("Új vonalkód! Add meg a nevet és tölts fel egy kép linket.");
-        }
-    });
-}
-
-function renderShoppingList() {
-    const container = document.getElementById("shoppingListContainer");
-    container.innerHTML = "";
-    const all = [...foodData, ...cleaningData].filter(d => Number(d.pieces) <= Number(d.minPieces) && Number(d.minPieces) > 0);
-    
-    if (!all.length) { container.innerHTML = "Minden készleten!"; return; }
-    all.forEach(i => {
-        container.innerHTML += `
-            <div style="padding:10px; border-bottom:1px solid #374151">
-                <b>${i.name}</b> (${i.pieces} van / ${i.minPieces} kell)
-            </div>`;
-    });
-}
-
-function editItem(i) {
-    const d = (currentPage === "food" ? foodData : cleaningData)[i];
-    document.getElementById("name").value = d.name;
-    document.getElementById("pieces").value = d.pieces;
-    document.getElementById("minPieces").value = d.minPieces;
-    document.getElementById("qty").value = d.qty;
-    document.getElementById("unit").value = d.unit;
-    document.getElementById("storage").value = d.storage;
-    editIndex = i;
-    window.scrollTo(0,0);
-}
-
-function clearForm() {
-    document.getElementById("name").value = ""; 
-    document.getElementById("pieces").value = "";
-    document.getElementById("imgUrl").value = "";
-    editIndex = null;
+        } else { lastBarcode = text; alert("Új vonalkód!"); }
+    }).catch(() => alert("Kamera hiba"));
 }
 
 function setCategory(cat) {
     currentPage = cat;
-    document.getElementById("headerTitle").innerText = cat === 'food' ? "🥦 Élelmiszer" : "🧴 Tisztító";
-    updateStorageOptions();
-    render();
+    document.getElementById("foodBtn").classList.toggle("active-page", cat === 'food');
+    document.getElementById("cleanBtn").classList.toggle("active-page", cat === 'cleaning');
+    updateStorageOptions(); render();
 }
 
 function updateStorageOptions() {
@@ -290,6 +324,64 @@ function updateStorageOptions() {
     s.innerHTML = "";
     storageOptions[currentPage].forEach(opt => s.innerHTML += `<option value="${opt}">${opt}</option>`);
 }
+
+function clearForm() {
+    document.getElementById("name").value = ""; document.getElementById("pieces").value = "";
+    document.getElementById("imgUrl").value = ""; editIndex = null;
+    document.getElementById("saveBtn").innerText = "Mentés a listába";
+}
+
+/* CHAT */
+function addNote() {
+    const text = document.getElementById("noteText").value.trim();
+    if(!text) return;
+    notesData.unshift({ user: document.getElementById("userSelect").value, text, time: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) });
+    save(); document.getElementById("noteText").value = ""; renderNotes();
+}
+function renderNotes() {
+    const list = document.getElementById("notesList");
+    const me = document.getElementById("userSelect").value;
+    list.innerHTML = notesData.map((n, i) => `
+        <div class="bubble ${n.user === me ? 'me' : 'other'}">
+            <small><b>${n.user}</b></small><br>${n.text}
+            <div style="font-size:9px;text-align:right;opacity:0.6">${n.time} <span onclick="deleteNote(${i})" style="color:red;cursor:pointer">x</span></div>
+        </div>`).join("");
+}
+function deleteNote(i) { notesData.splice(i,1); save(); renderNotes(); }
+
+/* STATS */
+function renderDashboard() {
+    const data = [...foodData, ...cleaningData];
+    const low = data.filter(d => Number(d.pieces) <= Number(d.minPieces) && Number(d.minPieces) > 0).length;
+    document.getElementById("dashboard").innerHTML = `
+        <div class="dash-card"><b>Összes tétel</b><br>${data.length} db</div>
+        <div class="dash-card" style="color:#facc15"><b>Hiányzó</b><br>${low} db</div>`;
+}
+function renderCharts() {
+    const ctx = document.getElementById("piecesChart");
+    const labels = storageOptions[currentPage];
+    const counts = labels.map(l => (currentPage === 'food' ? foodData : cleaningData).filter(d => d.storage === l).reduce((a,b) => a + Number(b.pieces), 0));
+    if(piecesChart) piecesChart.destroy();
+    piecesChart = new Chart(ctx, { type: 'doughnut', data: { labels, datasets: [{ data: counts, backgroundColor: ['#22c55e', '#3b82f6', '#facc15', '#ef4444'] }] }, options: { plugins: { legend: { labels: { color: 'white' } } } } });
+}
+
+/* BACKUP */
+function exportData() {
+    const blob = new Blob([JSON.stringify({ food: foodData, cleaning: cleaningData, notes: notesData, barcodeDatabase })], { type: "application/json" });
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "keszlet_mentes.json"; a.click();
+}
+function importData() {
+    const file = document.getElementById("importFile").files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const d = JSON.parse(e.target.result);
+        foodData = d.food; cleaningData = d.cleaning; notesData = d.notes; barcodeDatabase = d.barcodeDatabase;
+        save(); location.reload();
+    };
+    reader.readAsText(file);
+}
+function clearAllData() { if(confirm("Tuti?")) { localStorage.clear(); location.reload(); } }
 
 updateStorageOptions();
 render();

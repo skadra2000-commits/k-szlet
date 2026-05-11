@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Készlet PRO - Komplett</title>
+    <title>Készlet PRO - Minden Funkció</title>
     
     <meta name="theme-color" content="#111827">
     <meta name="mobile-web-app-capable" content="yes">
@@ -15,17 +15,17 @@
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         body { margin: 0; font-family: 'Segoe UI', Roboto, sans-serif; background: #0f172a; color: white; overflow-x: hidden; }
-        header { background: #111827; padding: 18px; text-align: center; font-size: 20px; font-weight: bold; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #374151; }
+        header { background: #111827; padding: 18px; text-align: center; font-size: 20px; font-weight: bold; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #374151; box-shadow: 0 2px 10px rgba(0,0,0,0.5); }
         
         .container { padding: 12px; padding-bottom: 130px; max-width: 600px; margin: 0 auto; }
         .card { background: #1f2937; padding: 16px; border-radius: 18px; margin-bottom: 14px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
         
         input, select, textarea { width: 100%; display: block; padding: 14px; margin: 8px 0; border: 1px solid #4b5563; border-radius: 12px; background: #111827; color: white; font-size: 16px; }
-        button { width: 100%; border: none; border-radius: 12px; padding: 14px; margin-top: 8px; background: #22c55e; color: black; font-weight: bold; cursor: pointer; transition: 0.1s; }
-        button:active { transform: scale(0.98); }
+        button { width: 100%; border: none; border-radius: 12px; padding: 14px; margin-top: 8px; background: #22c55e; color: black; font-weight: bold; cursor: pointer; }
+        button:active { transform: scale(0.98); opacity: 0.8; }
         
-        .item { background: #111827; padding: 14px; border-radius: 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 12px; border-left: 5px solid #22c55e; }
-        .prod-img { width: 50px; height: 50px; border-radius: 10px; object-fit: cover; background: #374151; flex-shrink: 0; }
+        .item { background: #111827; padding: 14px; border-radius: 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 12px; border-left: 5px solid #22c55e; position: relative; }
+        .prod-img { width: 50px; height: 50px; border-radius: 10px; object-fit: cover; background: #374151; flex-shrink: 0; border: 1px solid #4b5563; }
         .item-info { flex-grow: 1; }
 
         .navbar { position: fixed; bottom: 0; left: 0; right: 0; background: #111827; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #374151; z-index: 200; padding-bottom: calc(10px + env(safe-area-inset-bottom)); }
@@ -33,18 +33,23 @@
         .navbtn span { display: block; font-size: 22px; margin-bottom: 4px; }
         .navbtn.active { color: #22c55e; }
         
-        #reader { border-radius: 14px; overflow: hidden; margin: 10px 0; background: #000; }
+        #reader { border-radius: 14px; overflow: hidden; margin: 10px 0; background: #000; min-height: 200px; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         .small-btn { width: auto; padding: 8px 14px; font-size: 12px; margin: 0; }
         .page-btn { width: auto; padding: 10px 18px; margin-right: 8px; background: #374151; color: white; border-radius: 10px; }
         .active-page { background: #22c55e; color: black; }
         
-        .bubble { padding: 12px; border-radius: 15px; margin-bottom: 10px; max-width: 85%; }
-        .bubble.me { background: #22c55e; color: black; align-self: flex-end; margin-left: auto; }
-        .bubble.other { background: #374151; color: white; }
+        /* CHAT STÍLUSOK */
+        .chat-container { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+        .bubble { max-width: 85%; padding: 12px 16px; border-radius: 20px; position: relative; line-height: 1.4; }
+        .bubble.me { align-self: flex-end; background: #22c55e; color: black; border-bottom-right-radius: 4px; }
+        .bubble.other { align-self: flex-start; background: #374151; color: white; border-bottom-left-radius: 4px; }
+        .bubble-time { font-size: 10px; opacity: 0.6; margin-top: 5px; text-align: right; }
+        
         .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .dash-card { background: #111827; padding: 12px; border-radius: 12px; text-align: center; border: 1px solid #374151; }
+        .dash-card { background: #111827; padding: 14px; border-radius: 14px; text-align: center; border: 1px solid #374151; }
+        .danger-btn { background: #ef4444 !important; color: white; }
     </style>
 </head>
 <body>
@@ -60,6 +65,7 @@
         </div>
 
         <div class="card">
+            <h3 id="formTitle" style="margin:0 0 10px 0">➕ Új tétel</h3>
             <input id="name" placeholder="Termék neve">
             <div style="display: flex; gap: 8px;">
                 <input id="pieces" type="number" placeholder="Aktuális db">
@@ -69,7 +75,7 @@
                 <input id="qty" type="number" placeholder="Kiszerelés">
                 <select id="unit"><option value="kg">kg</option><option value="g">g</option><option value="liter">liter</option><option value="ml">ml</option><option value="db">db</option></select>
             </div>
-            <input id="imgUrl" placeholder="Kép URL link (opcionális)">
+            <input id="imgUrl" placeholder="Kép URL (pl. Google kép link)">
             <select id="storage"></select>
             <button onclick="addItem()" id="saveBtn">Mentés a listába</button>
         </div>
@@ -94,34 +100,43 @@
     <div id="boltTab" class="tab-content">
         <div class="card">
             <h2>🏪 Termék Adatbázis</h2>
+            <p style="font-size: 13px; color: #94a3b8;">Szkennelt termékek listája. Kattints a 🛒 gombra a bevásárláshoz.</p>
             <div id="boltListContainer"></div>
         </div>
     </div>
 
     <div id="chartsTab" class="tab-content">
-        <div class="card"><div id="dashboard" class="dashboard-grid"></div></div>
-        <div class="card"><canvas id="piecesChart"></canvas></div>
+        <div class="card">
+            <h3>📊 Dashboard</h3>
+            <div id="dashboard" class="dashboard-grid"></div>
+        </div>
+        <div class="card">
+            <canvas id="piecesChart"></canvas>
+        </div>
     </div>
 
     <div id="notesTab" class="tab-content">
         <div class="card">
+            <h3>💬 Üzenőfal</h3>
             <select id="userSelect" onchange="localStorage.setItem('lastUser', this.value); renderNotes();">
                 <option value="Fanni">🌸 Fanni</option>
                 <option value="Laci">🧔 Laci</option>
             </select>
-            <textarea id="noteText" placeholder="Üzenet..."></textarea>
+            <textarea id="noteText" placeholder="Írj valamit..."></textarea>
             <button onclick="addNote()" style="background: #a855f7; color: white;">Küldés</button>
         </div>
-        <div id="notesList" style="display: flex; flex-direction: column;"></div>
+        <div class="chat-container" id="notesList"></div>
     </div>
 
     <div id="settingsTab" class="tab-content">
         <div class="card">
+            <h2>💾 Adatkezelés</h2>
             <button onclick="exportData()" style="background: #3b82f6; color: white;">📂 Adatok mentése fájlba</button>
-            <hr style="border: 1px solid #374151; margin: 20px 0;">
+            <hr style="border:1px solid #374151; margin:20px 0">
             <input type="file" id="importFile" accept=".json">
             <button onclick="importData()" style="background: #eab308; color: black;">🔄 Visszatöltés</button>
-            <button onclick="clearAllData()" style="background:#ef4444; color:white; margin-top:30px">🗑️ MINDEN TÖRLÉSE</button>
+            <hr style="border:1px solid #374151; margin:20px 0">
+            <button onclick="clearAllData()" class="danger-btn">🗑️ MINDEN ADAT TÖRLÉSE</button>
         </div>
     </div>
 </div>
@@ -132,10 +147,11 @@
     <div class="navbtn" id="navBolt" onclick="showTab('bolt')"><span>🏪</span>Bolt</div>
     <div class="navbtn" id="navCharts" onclick="showTab('charts')"><span>📈</span>Graf</div>
     <div class="navbtn" id="navNotes" onclick="showTab('notes')"><span>💬</span>Chat</div>
-    <div class="navbtn" id="navSettings" onclick="showTab('settings')"><span>💾</span>Vissza</div>
+    <div class="navbtn" id="navSettings" onclick="showTab('settings')"><span>💾</span>Backup</div>
 </div>
 
 <script>
+/* GLOBÁLIS ADATOK */
 let currentPage = "food";
 let editIndex = null;
 let lastBarcode = null;
@@ -150,6 +166,8 @@ const storageOptions = {
     food: ["🧊 Hűtő", "❄️ Fagyasztó", "🗄️ Szekrény", "🥫 Spájz"],
     cleaning: ["🚽 Fürdő", "🍳 Konyha", "🧺 Mosó polc"]
 };
+
+document.getElementById("userSelect").value = localStorage.getItem("lastUser") || "Fanni";
 
 function save() {
     localStorage.setItem("food", JSON.stringify(foodData));
@@ -180,6 +198,8 @@ function renderBolt() {
         if(!seen.has(b.name)) { products.push(b); seen.add(b.name); }
     });
 
+    if(!products.length) { container.innerHTML = "<p style='text-align:center;color:#94a3b8'>Még nincs beolvasott termék.</p>"; return; }
+
     products.forEach(p => {
         const imgHtml = p.img ? `<img src="${p.img}" class="prod-img">` : `<div class="prod-img" style="display:flex;align-items:center;justify-content:center;background:#374151">📦</div>`;
         container.innerHTML += `
@@ -197,13 +217,13 @@ function quickAddToShop(name) {
     if (item) {
         item.minPieces = Math.max(Number(item.pieces), Number(item.minPieces)) + 1;
     } else {
-        const dbInfo = Object.values(barcodeDatabase).find(b => b.name === name);
+        const dbInfo = Object.values(barcodeDatabase).find(b => b.name === name) || {qty:1, unit:'db'};
         foodData.push({ name, pieces: 0, minPieces: 1, qty: dbInfo.qty, unit: dbInfo.unit, storage: storageOptions.food[0], expiry: "" });
     }
-    save(); alert("Listára került!");
+    save(); alert("Hozzáadva a bevásárlólistához!");
 }
 
-/* KÉSZLET RENDER KÉPPEL (Csak ha > 0) */
+/* KÉSZLET RENDER KÉPPEL (Csak ha > 0 vagy szerkesztés alatt) */
 function render() {
     const data = currentPage === "food" ? foodData : cleaningData;
     const list = document.getElementById("list");
@@ -250,7 +270,7 @@ function removeFromShopList(origin, idx) {
     save(); renderShoppingList();
 }
 
-/* ALAP FUNKCIÓK */
+/* FORM KEZELÉS */
 function addItem() {
     const name = document.getElementById("name").value.trim();
     const pieces = Number(document.getElementById("pieces").value) || 0;
@@ -260,7 +280,7 @@ function addItem() {
     const storage = document.getElementById("storage").value;
     const img = document.getElementById("imgUrl").value.trim();
 
-    if (!name) return alert("Név kell!");
+    if (!name) return alert("Név kötelező!");
     const data = (currentPage === "food") ? foodData : cleaningData;
 
     if (editIndex !== null) {
@@ -286,13 +306,15 @@ function editItem(i) {
     document.getElementById("qty").value = d.qty;
     document.getElementById("unit").value = d.unit;
     document.getElementById("storage").value = d.storage;
+    const dbE = Object.values(barcodeDatabase).find(b => b.name === d.name);
+    document.getElementById("imgUrl").value = dbE ? dbE.img : "";
     editIndex = i;
     document.getElementById("saveBtn").innerText = "Módosítás mentése";
     window.scrollTo(0,0);
 }
 
 function deleteItem(i) { 
-    if(confirm("Törlöd?")) { 
+    if(confirm("Törlöd a készletből?")) { 
         if(currentPage==="food") foodData.splice(i,1); else cleaningData.splice(i,1); 
         save(); render(); 
     } 
@@ -308,8 +330,8 @@ function startScanner() {
             document.getElementById("qty").value = item.qty;
             document.getElementById("unit").value = item.unit;
             document.getElementById("imgUrl").value = item.img || "";
-        } else { lastBarcode = text; alert("Új vonalkód!"); }
-    }).catch(() => alert("Kamera hiba"));
+        } else { lastBarcode = text; alert("Új vonalkód! Add meg az adatokat."); }
+    }).catch(() => alert("Kamera hiba vagy letiltva."));
 }
 
 function setCategory(cat) {
@@ -326,63 +348,94 @@ function updateStorageOptions() {
 }
 
 function clearForm() {
-    document.getElementById("name").value = ""; document.getElementById("pieces").value = "";
-    document.getElementById("imgUrl").value = ""; editIndex = null;
+    document.getElementById("name").value = ""; 
+    document.getElementById("pieces").value = "";
+    document.getElementById("minPieces").value = "";
+    document.getElementById("imgUrl").value = ""; 
+    editIndex = null;
     document.getElementById("saveBtn").innerText = "Mentés a listába";
 }
 
-/* CHAT */
+/* CHAT FUNKCIÓK */
 function addNote() {
     const text = document.getElementById("noteText").value.trim();
     if(!text) return;
-    notesData.unshift({ user: document.getElementById("userSelect").value, text, time: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) });
+    notesData.unshift({ 
+        user: document.getElementById("userSelect").value, 
+        text, 
+        time: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) 
+    });
     save(); document.getElementById("noteText").value = ""; renderNotes();
 }
+
 function renderNotes() {
     const list = document.getElementById("notesList");
     const me = document.getElementById("userSelect").value;
-    list.innerHTML = notesData.map((n, i) => `
-        <div class="bubble ${n.user === me ? 'me' : 'other'}">
-            <small><b>${n.user}</b></small><br>${n.text}
-            <div style="font-size:9px;text-align:right;opacity:0.6">${n.time} <span onclick="deleteNote(${i})" style="color:red;cursor:pointer">x</span></div>
-        </div>`).join("");
+    list.innerHTML = "";
+    notesData.forEach((n, i) => {
+        const isMe = n.user === me;
+        list.innerHTML += `
+            <div class="bubble ${isMe ? 'me' : 'other'}">
+                <small><b>${n.user}</b></small><br>${n.text}
+                <div class="bubble-time">${n.time} <span onclick="deleteNote(${i})" style="color:red;cursor:pointer;margin-left:5px">×</span></div>
+            </div>`;
+    });
 }
 function deleteNote(i) { notesData.splice(i,1); save(); renderNotes(); }
 
-/* STATS */
+/* STATISZTIKA */
 function renderDashboard() {
     const data = [...foodData, ...cleaningData];
+    const total = data.reduce((a,b) => a + Number(b.pieces), 0);
     const low = data.filter(d => Number(d.pieces) <= Number(d.minPieces) && Number(d.minPieces) > 0).length;
     document.getElementById("dashboard").innerHTML = `
-        <div class="dash-card"><b>Összes tétel</b><br>${data.length} db</div>
-        <div class="dash-card" style="color:#facc15"><b>Hiányzó</b><br>${low} db</div>`;
+        <div class="dash-card"><b>Összes készlet</b><br>${total} db</div>
+        <div class="dash-card" style="color:#ef4444"><b>Hiányzó tételek</b><br>${low} db</div>`;
 }
+
 function renderCharts() {
     const ctx = document.getElementById("piecesChart");
     const labels = storageOptions[currentPage];
-    const counts = labels.map(l => (currentPage === 'food' ? foodData : cleaningData).filter(d => d.storage === l).reduce((a,b) => a + Number(b.pieces), 0));
+    const counts = labels.map(l => (currentPage === 'food' ? foodData : cleaningData)
+        .filter(d => d.storage === l)
+        .reduce((sum, item) => sum + Number(item.pieces), 0));
+    
     if(piecesChart) piecesChart.destroy();
-    piecesChart = new Chart(ctx, { type: 'doughnut', data: { labels, datasets: [{ data: counts, backgroundColor: ['#22c55e', '#3b82f6', '#facc15', '#ef4444'] }] }, options: { plugins: { legend: { labels: { color: 'white' } } } } });
+    piecesChart = new Chart(ctx, { 
+        type: 'doughnut', 
+        data: { 
+            labels, 
+            datasets: [{ data: counts, backgroundColor: ['#22c55e', '#3b82f6', '#facc15', '#ef4444', '#a855f7'] }] 
+        }, 
+        options: { plugins: { legend: { labels: { color: 'white' }, position: 'bottom' } } } 
+    });
 }
 
-/* BACKUP */
+/* BACKUP RENDSZER */
 function exportData() {
     const blob = new Blob([JSON.stringify({ food: foodData, cleaning: cleaningData, notes: notesData, barcodeDatabase })], { type: "application/json" });
-    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "keszlet_mentes.json"; a.click();
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); 
+    a.download = `keszlet_mentes_${new Date().toISOString().slice(0,10)}.json`; a.click();
 }
+
 function importData() {
     const file = document.getElementById("importFile").files[0];
     if (!file) return;
     const reader = new FileReader();
     reader.onload = (e) => {
-        const d = JSON.parse(e.target.result);
-        foodData = d.food; cleaningData = d.cleaning; notesData = d.notes; barcodeDatabase = d.barcodeDatabase;
-        save(); location.reload();
+        try {
+            const d = JSON.parse(e.target.result);
+            foodData = d.food || []; cleaningData = d.cleaning || []; 
+            notesData = d.notes || []; barcodeDatabase = d.barcodeDatabase || {};
+            save(); alert("Sikeres visszatöltés!"); location.reload();
+        } catch(err) { alert("Hibás fájlformátum!"); }
     };
     reader.readAsText(file);
 }
-function clearAllData() { if(confirm("Tuti?")) { localStorage.clear(); location.reload(); } }
 
+function clearAllData() { if(confirm("Minden adatot véglegesen törölsz?")) { localStorage.clear(); location.reload(); } }
+
+/* INDÍTÁS */
 updateStorageOptions();
 render();
 </script>

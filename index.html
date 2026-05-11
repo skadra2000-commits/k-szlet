@@ -123,7 +123,7 @@
     <div id="boltTab" class="tab-content">
         <div class="card">
             <h2>🏪 Termék Adatbázis</h2>
-            <p style="font-size: 13px; color: #94a3b8;">Itt csak azokat a termékeket látod, amikhez már mentettél vonalkódot.</p>
+            <p style="font-size: 13px; color: #94a3b8;">Csak a vonalkódos termékek. Kattints a 🛒 gombra a bevásárlólistához!</p>
             <div id="boltListContainer"></div>
         </div>
     </div>
@@ -218,7 +218,7 @@ function showTab(tab) {
     if(tab === 'notes') renderNotes();
 }
 
-/* BOLT / ADATBÁZIS - JAVÍTVA */
+/* BOLT / ADATBÁZIS */
 function renderBolt() {
     const container = document.getElementById("boltListContainer");
     container.innerHTML = "";
@@ -245,47 +245,27 @@ function renderBolt() {
 }
 
 function quickAddToShop(name) {
-    // Megkeressük a terméket mindkét listában
     let item = foodData.find(i => i.name.toLowerCase() === name.toLowerCase()) || 
                cleaningData.find(i => i.name.toLowerCase() === name.toLowerCase());
     
     const info = Object.values(barcodeDatabase).find(b => b.name === name) || {qty:1, unit:"db"};
 
     if (item) {
-        // JAVÍTÁS: Mindig növeljük a vész-szintet legalább annyira, hogy a lista eleme legyen
-        // Ha már rajta van a listán, akkor +1 darabbal növeljük a vész-szintet, hogy látszódjon a szándék
         let currentMin = Number(item.minPieces);
         let currentStock = Number(item.pieces);
-        
-        if (currentStock >= currentMin) {
-            item.minPieces = currentStock + 1;
-        } else {
-            item.minPieces = currentMin + 1;
-        }
+        item.minPieces = Math.max(currentStock, currentMin) + 1;
     } else {
-        // Ha új, alapértelmezetten a Konyhába rakjuk 0 db készlettel és 1 db vész-szinttel
         foodData.push({
-            name: name,
-            pieces: 0,
-            minPieces: 1,
-            qty: info.qty,
-            unit: info.unit,
-            storage: storageOptions.food[0],
-            expiry: ""
+            name: name, pieces: 0, minPieces: 1, qty: info.qty, unit: info.unit,
+            storage: storageOptions.food[0], expiry: ""
         });
     }
     
     save();
-    
     const btn = document.getElementById(`bolt-btn-${name.replace(/\s/g, '')}`);
     if(btn) {
-        const oldText = btn.innerText;
-        btn.innerText = "Hozzáadva ✅";
-        btn.style.background = "#22c55e";
-        setTimeout(() => {
-            btn.innerText = oldText;
-            btn.style.background = "#facc15";
-        }, 800);
+        const oldText = btn.innerText; btn.innerText = "Hozzáadva ✅"; btn.style.background = "#22c55e";
+        setTimeout(() => { btn.innerText = oldText; btn.style.background = "#facc15"; }, 800);
     }
 }
 
@@ -389,6 +369,7 @@ function addItem() {
     save(); clearForm(); render();
 }
 
+/* JAVÍTOTT RENDER: Csak a készleten lévőket mutatja */
 function render() {
     const data = currentPage === "food" ? foodData : cleaningData;
     const list = document.getElementById("list");
@@ -397,23 +378,26 @@ function render() {
 
     list.innerHTML = "";
     data.forEach((d, i) => {
-        if (d.name.toLowerCase().includes(search) && (filter === "" || d.storage === filter)) {
-            const diff = d.expiry ? (new Date(d.expiry) - new Date()) / (1000 * 60 * 60 * 24) : 100;
-            const expClass = diff < 0 ? "exp-red" : (diff <= 7 ? "exp-yellow" : "exp-green");
-            const isLow = Number(d.pieces) <= Number(d.minPieces) && Number(d.minPieces) > 0;
-            
-            list.innerHTML += `
-                <div class="item ${expClass}" style="${isLow ? 'border-right: 6px solid #facc15;' : ''}">
-                    <div style="font-size: 17px; font-weight: bold; margin-bottom: 5px;">${d.name} ${isLow ? '⚠️' : ''}</div>
-                    <div style="font-size: 14px; color: #cbd5e1;">
-                        📦 ${d.pieces} db × ${d.qty} ${d.unit} (${formatSmart(d.qty * d.pieces, d.unit)})<br>
-                        📍 ${d.storage} | ⏳ Lejárat: ${d.expiry || "---"}
-                    </div>
-                    <div style="margin-top:12px; display: flex; gap: 8px;">
-                        <button class="small-btn" style="background:#3b82f6;color:white" onclick="editItem(${i})">Szerkesztés</button>
-                        <button class="small-btn" style="background:#ef4444;color:white" onclick="deleteItem(${i})">Törlés</button>
-                    </div>
-                </div>`;
+        // JAVÍTÁS: Csak akkor jelenik meg, ha db > 0 VAGY épp ezt szerkesztjük
+        if (Number(d.pieces) > 0 || editIndex === i) {
+            if (d.name.toLowerCase().includes(search) && (filter === "" || d.storage === filter)) {
+                const diff = d.expiry ? (new Date(d.expiry) - new Date()) / (1000 * 60 * 60 * 24) : 100;
+                const expClass = diff < 0 ? "exp-red" : (diff <= 7 ? "exp-yellow" : "exp-green");
+                const isLow = Number(d.pieces) <= Number(d.minPieces) && Number(d.minPieces) > 0;
+                
+                list.innerHTML += `
+                    <div class="item ${expClass}" style="${isLow ? 'border-right: 6px solid #facc15;' : ''}">
+                        <div style="font-size: 17px; font-weight: bold; margin-bottom: 5px;">${d.name} ${isLow ? '⚠️' : ''}</div>
+                        <div style="font-size: 14px; color: #cbd5e1;">
+                            📦 ${d.pieces} db × ${d.qty} ${d.unit} (${formatSmart(d.qty * d.pieces, d.unit)})<br>
+                            📍 ${d.storage} | ⏳ Lejárat: ${d.expiry || "---"}
+                        </div>
+                        <div style="margin-top:12px; display: flex; gap: 8px;">
+                            <button class="small-btn" style="background:#3b82f6;color:white" onclick="editItem(${i})">Szerkesztés</button>
+                            <button class="small-btn" style="background:#ef4444;color:white" onclick="deleteItem(${i})">Törlés</button>
+                        </div>
+                    </div>`;
+            }
         }
     });
 }
@@ -430,6 +414,7 @@ function editItem(i) {
     editIndex = i;
     document.getElementById("saveBtn").innerText = "Módosítás mentése";
     showTab('home');
+    render(); // Újrarendereljük, hogy látszódjon a 0-s is szerkesztéskor
     window.scrollTo({top: 0, behavior: 'smooth'});
 }
 
@@ -452,7 +437,6 @@ function renderAllCharts() {
         stats[d.storage].totalPieces += Number(d.pieces);
     });
     const labels = Object.keys(stats);
-
     if (weightChart) weightChart.destroy();
     weightChart = new Chart(document.getElementById("weightChart"), {
         type: 'bar',
@@ -465,7 +449,6 @@ function renderAllCharts() {
         },
         options: { responsive: true, plugins: { legend: { labels: { color: 'white' } } }, scales: { y: { ticks: { color: 'white' } }, x: { ticks: { color: 'white' } } } }
     });
-
     if (piecesChart) piecesChart.destroy();
     piecesChart = new Chart(document.getElementById("piecesChart"), {
         type: 'doughnut',
@@ -480,7 +463,7 @@ function renderAllCharts() {
 function renderDashboard() {
     const data = currentPage === "food" ? foodData : cleaningData;
     const sum = {};
-    data.forEach(d => sum[d.storage] = (sum[d.storage] || 0) + Number(d.pieces));
+    data.forEach(d => { if(Number(d.pieces)>0) sum[d.storage] = (sum[d.storage] || 0) + Number(d.pieces); });
     const dash = document.getElementById("dashboard");
     dash.innerHTML = "";
     for (let s in sum) dash.innerHTML += `<div class="dash-card"><b>${s}</b><br>${sum[s]} db</div>`;

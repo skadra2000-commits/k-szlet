@@ -218,12 +218,11 @@ function showTab(tab) {
     if(tab === 'notes') renderNotes();
 }
 
-/* BOLT / ADATBÁZIS - CSAK VONALKÓDOS TERMÉKEK */
+/* BOLT / ADATBÁZIS - JAVÍTVA */
 function renderBolt() {
     const container = document.getElementById("boltListContainer");
     container.innerHTML = "";
     
-    // Itt a szűrés: Csak a vonalkód adatbázisból (barcodeDatabase) vesszük a neveket
     let scanneredProducts = new Set();
     Object.values(barcodeDatabase).forEach(i => scanneredProducts.add(i.name));
 
@@ -233,9 +232,7 @@ function renderBolt() {
     }
 
     scanneredProducts.forEach(prodName => {
-        // Megkeressük a vonalkódos infót az alapértelmezett értékekhez
         const barcodeInfo = Object.values(barcodeDatabase).find(b => b.name === prodName);
-        
         container.innerHTML += `
             <div class="item" style="display:flex; justify-content:space-between; align-items:center;">
                 <div>
@@ -248,14 +245,25 @@ function renderBolt() {
 }
 
 function quickAddToShop(name) {
-    let item = [...foodData, ...cleaningData].find(i => i.name.toLowerCase() === name.toLowerCase());
+    // Megkeressük a terméket mindkét listában
+    let item = foodData.find(i => i.name.toLowerCase() === name.toLowerCase()) || 
+               cleaningData.find(i => i.name.toLowerCase() === name.toLowerCase());
     
-    // Megkeressük az adatbázisban a mentett egységeket
     const info = Object.values(barcodeDatabase).find(b => b.name === name) || {qty:1, unit:"db"};
 
     if (item) {
-        item.minPieces = Math.max(Number(item.minPieces), Number(item.pieces) + 1);
+        // JAVÍTÁS: Mindig növeljük a vész-szintet legalább annyira, hogy a lista eleme legyen
+        // Ha már rajta van a listán, akkor +1 darabbal növeljük a vész-szintet, hogy látszódjon a szándék
+        let currentMin = Number(item.minPieces);
+        let currentStock = Number(item.pieces);
+        
+        if (currentStock >= currentMin) {
+            item.minPieces = currentStock + 1;
+        } else {
+            item.minPieces = currentMin + 1;
+        }
     } else {
+        // Ha új, alapértelmezetten a Konyhába rakjuk 0 db készlettel és 1 db vész-szinttel
         foodData.push({
             name: name,
             pieces: 0,
@@ -277,7 +285,7 @@ function quickAddToShop(name) {
         setTimeout(() => {
             btn.innerText = oldText;
             btn.style.background = "#facc15";
-        }, 1000);
+        }, 800);
     }
 }
 
@@ -497,7 +505,7 @@ function copyShoppingList() {
     const all = [...foodData, ...cleaningData];
     const toBuy = all.filter(d => Number(d.pieces) <= Number(d.minPieces) && Number(d.minPieces) > 0);
     if(!toBuy.length) return alert("Üres.");
-    const text = "🛒 LISTA:\n" + toBuy.map(i => `- ${i.name} (${i.pieces} db van)`).join("\n");
+    const text = "🛒 LISTA:\n" + toBuy.map(i => `- ${i.name} (kell: ${i.minPieces} db)`).join("\n");
     navigator.clipboard.writeText(text); alert("Másolva!");
 }
 

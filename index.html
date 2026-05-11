@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Készlet PRO</title>
+    <title>Készlet PRO + Képek</title>
     
     <meta name="theme-color" content="#111827">
     <meta name="mobile-web-app-capable" content="yes">
@@ -20,46 +20,33 @@
         .container { padding: 12px; padding-bottom: 130px; max-width: 600px; margin: 0 auto; }
         .card { background: #1f2937; padding: 16px; border-radius: 18px; margin-bottom: 14px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.3); }
         
-        .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .dash-card { background: #111827; padding: 14px; border-radius: 14px; text-align: center; border: 1px solid #374151; }
-        
         input, select, textarea { width: 100%; display: block; padding: 14px; margin: 8px 0; border: none; border-radius: 12px; background: #111827; color: white; font-size: 16px; border: 1px solid #4b5563; }
-        input:focus { border-color: #22c55e; }
         
-        button { width: 100%; border: none; border-radius: 12px; padding: 14px; margin-top: 8px; background: #22c55e; color: black; font-weight: bold; font-size: 15px; cursor: pointer; transition: transform 0.1s; }
-        button:active { transform: scale(0.98); opacity: 0.8; }
+        button { width: 100%; border: none; border-radius: 12px; padding: 14px; margin-top: 8px; background: #22c55e; color: black; font-weight: bold; cursor: pointer; }
         
-        .small-btn { width: auto; padding: 8px 14px; font-size: 12px; margin-right: 6px; }
-        .page-btn { width: auto; padding: 10px 18px; margin-right: 8px; background: #374151; color: white; border-radius: 10px; }
-        .active-page { background: #22c55e; color: black; }
+        .item { background: #111827; padding: 14px; border-radius: 16px; margin-bottom: 12px; border-left: 6px solid transparent; display: flex; align-items: center; gap: 12px; }
         
-        .item { background: #111827; padding: 16px; border-radius: 16px; margin-bottom: 12px; position: relative; border-left: 6px solid transparent; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .exp-red { border-left-color: #ef4444; }
-        .exp-yellow { border-left-color: #facc15; }
-        .exp-green { border-left-color: #22c55e; }
+        /* KÉP STÍLUS */
+        .prod-img { width: 50px; height: 50px; border-radius: 10px; object-fit: cover; background: #374151; flex-shrink: 0; border: 1px solid #4b5563; }
+        .item-info { flex-grow: 1; }
 
-        .chat-container { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
-        .bubble { max-width: 85%; padding: 12px 16px; border-radius: 20px; position: relative; line-height: 1.4; }
-        .bubble.me { align-self: flex-end; background: #22c55e; color: black; border-bottom-right-radius: 4px; }
-        .bubble.other { align-self: flex-start; background: #374151; color: white; border-bottom-left-radius: 4px; }
-        
         .navbar { position: fixed; bottom: 0; left: 0; right: 0; background: #111827; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #374151; z-index: 200; padding-bottom: calc(10px + env(safe-area-inset-bottom)); }
-        .navbtn { text-align: center; font-size: 11px; cursor: pointer; color: #94a3b8; width: 16%; }
+        .navbtn { text-align: center; font-size: 11px; color: #94a3b8; width: 16%; }
         .navbtn span { display: block; font-size: 22px; margin-bottom: 4px; }
         .navbtn.active { color: #22c55e; }
         
-        #reader { border-radius: 14px; overflow: hidden; margin-top: 10px; background: #000; min-height: 200px; }
+        #reader { border-radius: 14px; overflow: hidden; margin-top: 10px; background: #000; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
+        .small-btn { width: auto; padding: 8px 14px; font-size: 12px; }
+        .page-btn { width: auto; padding: 10px 18px; margin-right: 8px; background: #374151; color: white; border-radius: 10px; }
+        .active-page { background: #22c55e; color: black; }
         .danger-btn { background: #ef4444 !important; color: white; }
-        .delete-link { color: #ef4444; cursor: pointer; text-decoration: underline; font-size: 12px; }
     </style>
 </head>
 <body>
 
-<header id="headerTitle">🥦 Élelmiszer készlet</header>
+<header id="headerTitle">🥦 Élelmiszer</header>
 
 <div class="container">
     
@@ -70,36 +57,24 @@
         </div>
 
         <div class="card">
-            <h3 id="formTitle" style="margin-top:0">➕ Új tétel</h3>
             <input id="name" placeholder="Termék neve">
             <div style="display: flex; gap: 8px;">
                 <input id="pieces" type="number" placeholder="Aktuális db">
-                <input id="minPieces" type="number" placeholder="Vész-szint (db)">
+                <input id="minPieces" type="number" placeholder="Vész-szint">
             </div>
             <div style="display: flex; gap: 8px;">
                 <input id="qty" type="number" placeholder="Kiszerelés">
-                <select id="unit">
-                    <option value="kg">kg</option>
-                    <option value="g">g</option>
-                    <option value="liter">liter</option>
-                    <option value="ml">ml</option>
-                    <option value="db">db</option>
-                </select>
+                <select id="unit"><option value="kg">kg</option><option value="g">g</option><option value="liter">liter</option><option value="ml">ml</option><option value="db">db</option></select>
             </div>
-            <input id="expiry" type="date">
+            <input id="imgUrl" placeholder="Kép URL (opcionális)">
             <select id="storage"></select>
-            <button onclick="addItem()" id="saveBtn">Mentés a listába</button>
+            <button onclick="addItem()" id="saveBtn">Mentés</button>
         </div>
 
         <div class="card">
-            <h3>📷 Vonalkód</h3>
+            <h3>📷 Vonalkód beolvasás</h3>
             <div id="reader"></div>
             <button onclick="startScanner()" style="background: #3b82f6; color: white;">Scanner indítása</button>
-        </div>
-
-        <div class="card">
-            <select id="storageFilter" onchange="render()"></select>
-            <input id="search" placeholder="Termék keresése..." oninput="render()">
         </div>
 
         <div id="list"></div>
@@ -107,46 +82,15 @@
 
     <div id="shopTab" class="tab-content">
         <div class="card">
-            <h2>🛒 Szükséges tételek</h2>
-            <button onclick="copyShoppingList()" style="background:#facc15">📋 Lista másolása</button>
-            <div id="shoppingListContainer" style="margin-top:20px"></div>
+            <h2>🛒 Bevásárlólista</h2>
+            <div id="shoppingListContainer"></div>
         </div>
     </div>
 
     <div id="boltTab" class="tab-content">
         <div class="card">
-            <h2>🏪 Termék Adatbázis</h2>
-            <p style="font-size: 13px; color: #94a3b8;">Csak beszkennelt termékek.</p>
+            <h2>🏪 Bolt</h2>
             <div id="boltListContainer"></div>
-        </div>
-    </div>
-
-    <div id="chartsTab" class="tab-content">
-        <div class="card"><div id="dashboard" class="dashboard-grid"></div></div>
-        <div class="card"><canvas id="weightChart"></canvas></div>
-        <div class="card"><canvas id="piecesChart"></canvas></div>
-    </div>
-
-    <div id="notesTab" class="tab-content">
-        <div class="card">
-            <select id="userSelect" onchange="localStorage.setItem('lastUser', this.value); renderNotes();">
-                <option value="Fanni">🌸 Fanni</option>
-                <option value="Laci">🧔 Laci</option>
-            </select>
-            <textarea id="noteText" placeholder="Üzenet..."></textarea>
-            <button onclick="addNote()" style="background: #a855f7; color: white;">Küldés</button>
-        </div>
-        <div class="chat-container" id="notesList"></div>
-    </div>
-
-    <div id="settingsTab" class="tab-content">
-        <div class="card">
-            <button onclick="exportData()" style="background: #3b82f6; color: white;">📂 Mentés fájlba</button>
-            <hr>
-            <input type="file" id="importFile" accept=".json">
-            <button onclick="importData()" style="background: #eab308; color: black;">🔄 Visszaállítás</button>
-            <hr>
-            <button onclick="clearAllData()" class="danger-btn">🗑️ MINDEN TÖRLÉSE</button>
         </div>
     </div>
 </div>
@@ -155,34 +99,25 @@
     <div class="navbtn active" id="navHome" onclick="showTab('home')"><span>🏠</span>Készlet</div>
     <div class="navbtn" id="navShop" onclick="showTab('shop')"><span>🛒</span>Lista</div>
     <div class="navbtn" id="navBolt" onclick="showTab('bolt')"><span>🏪</span>Bolt</div>
-    <div class="navbtn" id="navCharts" onclick="showTab('charts')"><span>📈</span>Grafikon</div>
-    <div class="navbtn" id="navNotes" onclick="showTab('notes')"><span>💬</span>Chat</div>
-    <div class="navbtn" id="navSettings" onclick="showTab('settings')"><span>💾</span>Backup</div>
 </div>
 
 <script>
 let currentPage = "food";
 let editIndex = null;
 let lastBarcode = null;
-let weightChart = null;
-let piecesChart = null;
+
+let foodData = JSON.parse(localStorage.getItem("food")) || [];
+let cleaningData = JSON.parse(localStorage.getItem("cleaning")) || [];
+let barcodeDatabase = JSON.parse(localStorage.getItem("barcodeDatabase")) || {};
 
 const storageOptions = {
     food: ["🧊 Hűtő", "❄️ Fagyasztó", "🗄️ Szekrény", "🥫 Spájz"],
     cleaning: ["🚽 Fürdő", "🍳 Konyha", "🧺 Mosó polc"]
 };
 
-let foodData = JSON.parse(localStorage.getItem("food")) || [];
-let notesData = JSON.parse(localStorage.getItem("notes")) || [];
-let cleaningData = JSON.parse(localStorage.getItem("cleaning")) || [];
-let barcodeDatabase = JSON.parse(localStorage.getItem("barcodeDatabase")) || {};
-
-document.getElementById("userSelect").value = localStorage.getItem("lastUser") || "Fanni";
-
 function save() {
     localStorage.setItem("food", JSON.stringify(foodData));
     localStorage.setItem("cleaning", JSON.stringify(cleaningData));
-    localStorage.setItem("notes", JSON.stringify(notesData));
     localStorage.setItem("barcodeDatabase", JSON.stringify(barcodeDatabase));
 }
 
@@ -191,71 +126,34 @@ function showTab(tab) {
     document.getElementById(tab + 'Tab').classList.add('active');
     document.querySelectorAll('.navbtn').forEach(el => el.classList.remove('active'));
     document.getElementById('nav' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
-    
     if(tab === 'shop') renderShoppingList();
     if(tab === 'bolt') renderBolt();
-    if(tab === 'charts') { renderDashboard(); setTimeout(renderAllCharts, 200); }
-    if(tab === 'notes') renderNotes();
 }
 
-/* BEVÁSÁRLÓLISTA TÖRLÉS FUNKCIÓVAL */
-function renderShoppingList() {
-    const container = document.getElementById("shoppingListContainer");
-    container.innerHTML = "";
-    const all = [
-        ...foodData.map((item, index) => ({ ...item, globalIdx: index, cat: 'food' })),
-        ...cleaningData.map((item, index) => ({ ...item, globalIdx: index, cat: 'cleaning' }))
-    ];
-    
-    const toBuy = all.filter(d => Number(d.pieces) <= Number(d.minPieces) && Number(d.minPieces) > 0);
-    
-    if (!toBuy.length) { 
-        container.innerHTML = "<p style='text-align:center; color:#94a3b8;'>Üres a lista. 🎉</p>"; 
-        return; 
-    }
-
-    toBuy.forEach(i => {
-        container.innerHTML += `
-            <div style="display:flex; justify-content:space-between; align-items:center; padding:12px; border-bottom:1px solid #374151">
-                <span>
-                    <b>${i.name}</b><br>
-                    <small style="color:#94a3b8">${i.pieces} van / ${i.minPieces} kell</small>
-                </span>
-                <div style="display:flex; gap:10px;">
-                    <button class="small-btn" onclick="removeFromShopList('${i.cat}', ${i.globalIdx})" style="background:#ef4444; color:white; margin:0">🗑️</button>
-                </div>
-            </div>`;
-    });
-}
-
-function removeFromShopList(cat, idx) {
-    if (cat === 'food') {
-        foodData[idx].minPieces = 0;
-    } else {
-        cleaningData[idx].minPieces = 0;
-    }
-    save();
-    renderShoppingList();
-}
-
-/* BOLT RENDER */
+/* BOLT RENDER KÉPPEL */
 function renderBolt() {
     const container = document.getElementById("boltListContainer");
     container.innerHTML = "";
-    let scannered = new Set();
-    Object.values(barcodeDatabase).forEach(i => scannered.add(i.name));
+    
+    // Egyedi terméknevek kigyűjtése a barcode adatbázisból
+    let products = [];
+    let seen = new Set();
+    Object.values(barcodeDatabase).forEach(b => {
+        if(!seen.has(b.name)) {
+            products.push(b);
+            seen.add(b.name);
+        }
+    });
 
-    if(!scannered.size) {
-        container.innerHTML = "<p style='text-align:center; padding:20px; color:#94a3b8;'>Nincs szkennelt termék.</p>";
-        return;
-    }
-
-    scannered.forEach(prodName => {
-        const info = Object.values(barcodeDatabase).find(b => b.name === prodName);
+    products.forEach(p => {
+        const imgHtml = p.img ? `<img src="${p.img}" class="prod-img">` : `<div class="prod-img" style="display:flex;align-items:center;justify-content:center;font-size:20px">📦</div>`;
         container.innerHTML += `
-            <div class="item" style="display:flex; justify-content:space-between; align-items:center;">
-                <div><b>${prodName}</b><br><small style="color:#94a3b8">${info.qty} ${info.unit}</small></div>
-                <button class="small-btn" onclick="quickAddToShop('${prodName}')" style="background:#facc15; color:black; margin:0">🛒 Listára</button>
+            <div class="item">
+                ${imgHtml}
+                <div class="item-info">
+                    <b>${p.name}</b><br><small>${p.qty} ${p.unit}</small>
+                </div>
+                <button class="small-btn" onclick="quickAddToShop('${p.name}')" style="background:#facc15">🛒</button>
             </div>`;
     });
 }
@@ -263,35 +161,41 @@ function renderBolt() {
 function quickAddToShop(name) {
     let item = foodData.find(i => i.name.toLowerCase() === name.toLowerCase()) || 
                cleaningData.find(i => i.name.toLowerCase() === name.toLowerCase());
-    const info = Object.values(barcodeDatabase).find(b => b.name === name) || {qty:1, unit:"db"};
-
     if (item) {
         item.minPieces = Math.max(Number(item.pieces), Number(item.minPieces)) + 1;
     } else {
-        foodData.push({ name, pieces: 0, minPieces: 1, qty: info.qty, unit: info.unit, storage: storageOptions.food[0], expiry: "" });
+        const dbInfo = Object.values(barcodeDatabase).find(b => b.name === name);
+        foodData.push({ name, pieces: 0, minPieces: 1, qty: dbInfo.qty, unit: dbInfo.unit, storage: storageOptions.food[0], expiry: "" });
     }
     save();
-    showTab('shop');
+    alert("Hozzáadva a bevásárlólistához!");
 }
 
-/* KÉSZLET KEZELÉS */
-function setCategory(cat) {
-    currentPage = cat;
-    document.getElementById("foodPageBtn").classList.toggle("active-page", cat === 'food');
-    document.getElementById("cleaningPageBtn").classList.toggle("active-page", cat === 'cleaning');
-    document.getElementById("headerTitle").innerText = cat === 'food' ? "🥦 Élelmiszer" : "🧴 Tisztító";
-    updateStorageOptions();
-    render();
-}
+/* KÉSZLET RENDER KÉPPEL */
+function render() {
+    const data = currentPage === "food" ? foodData : cleaningData;
+    const list = document.getElementById("list");
+    list.innerHTML = "";
 
-function updateStorageOptions() {
-    const s = document.getElementById("storage");
-    const f = document.getElementById("storageFilter");
-    s.innerHTML = "";
-    f.innerHTML = '<option value="">Összes hely</option>';
-    storageOptions[currentPage].forEach(opt => {
-        s.innerHTML += `<option value="${opt}">${opt}</option>`;
-        f.innerHTML += `<option value="${opt}">${opt}</option>`;
+    data.forEach((d, i) => {
+        if (Number(d.pieces) > 0 || editIndex === i) {
+            // Megkeressük, van-e kép a barcode adatbázisban ehhez a névhez
+            const dbEntry = Object.values(barcodeDatabase).find(b => b.name.toLowerCase() === d.name.toLowerCase());
+            const imgHtml = (dbEntry && dbEntry.img) ? `<img src="${dbEntry.img}" class="prod-img">` : `<div class="prod-img" style="display:flex;align-items:center;justify-content:center;font-size:20px">📦</div>`;
+
+            list.innerHTML += `
+                <div class="item">
+                    ${imgHtml}
+                    <div class="item-info">
+                        <b>${d.name}</b><br>
+                        <small>${d.pieces} db | ${d.storage}</small>
+                    </div>
+                    <div style="display:flex;gap:5px">
+                        <button class="small-btn" onclick="editItem(${i})">✏️</button>
+                        <button class="small-btn" style="background:#ef4444;color:white" onclick="deleteItem(${i})">🗑️</button>
+                    </div>
+                </div>`;
+        }
     });
 }
 
@@ -302,48 +206,56 @@ function addItem() {
     const qty = document.getElementById("qty").value;
     const unit = document.getElementById("unit").value;
     const storage = document.getElementById("storage").value;
-    const expiry = document.getElementById("expiry").value;
+    const img = document.getElementById("imgUrl").value.trim();
 
-    if (!name) return alert("Név kell!");
+    if (!name) return alert("Név kötelező!");
     const data = (currentPage === "food") ? foodData : cleaningData;
 
     if (editIndex !== null) {
-        data[editIndex] = { name, pieces, minPieces, qty, unit, storage, expiry };
-        editIndex = null;
-        document.getElementById("saveBtn").innerText = "Mentés";
+        data[editIndex] = { ...data[editIndex], name, pieces, minPieces, qty, unit, storage };
     } else {
-        let exists = data.find(item => item.name.toLowerCase() === name.toLowerCase() && item.storage === storage);
-        if (exists) {
-            exists.pieces += pieces;
-        } else {
-            data.push({ name, pieces, minPieces, qty, unit, storage, expiry });
-        }
+        data.push({ name, pieces, minPieces, qty, unit, storage });
     }
-    if (lastBarcode) { barcodeDatabase[lastBarcode] = { name, qty, unit }; lastBarcode = null; }
+
+    // Ha van vonalkód folyamatban, vagy csak frissíteni akarjuk a globális adatbázis képét
+    if (lastBarcode || img) {
+        const code = lastBarcode || Date.now(); // Ha nincs barcode, egyedi azonosító
+        barcodeDatabase[code] = { name, qty, unit, img };
+        lastBarcode = null;
+    }
+
     save(); clearForm(); render();
 }
 
-function render() {
-    const data = currentPage === "food" ? foodData : cleaningData;
-    const list = document.getElementById("list");
-    const search = document.getElementById("search").value.toLowerCase();
-    const filter = document.getElementById("storageFilter").value;
-
-    list.innerHTML = "";
-    data.forEach((d, i) => {
-        if (Number(d.pieces) > 0 || editIndex === i) {
-            if (d.name.toLowerCase().includes(search) && (filter === "" || d.storage === filter)) {
-                const diff = d.expiry ? (new Date(d.expiry) - new Date()) / 86400000 : 100;
-                const expClass = diff < 0 ? "exp-red" : (diff <= 7 ? "exp-yellow" : "exp-green");
-                list.innerHTML += `
-                    <div class="item ${expClass}">
-                        <b>${d.name}</b><br>
-                        <small>${d.pieces} db | ${d.storage}</small><br>
-                        <button class="small-btn" onclick="editItem(${i})">Szerkeszt</button>
-                        <button class="small-btn" style="background:#ef4444;color:white" onclick="deleteItem(${i})">Töröl</button>
-                    </div>`;
-            }
+function startScanner() {
+    let html5QrCode = new Html5Qrcode("reader");
+    html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (text) => {
+        html5QrCode.stop();
+        if (barcodeDatabase[text]) {
+            const item = barcodeDatabase[text];
+            document.getElementById("name").value = item.name;
+            document.getElementById("qty").value = item.qty;
+            document.getElementById("unit").value = item.unit;
+            document.getElementById("imgUrl").value = item.img || "";
+            alert("Ismert termék: " + item.name);
+        } else {
+            lastBarcode = text;
+            alert("Új vonalkód! Add meg a nevet és tölts fel egy kép linket.");
         }
+    });
+}
+
+function renderShoppingList() {
+    const container = document.getElementById("shoppingListContainer");
+    container.innerHTML = "";
+    const all = [...foodData, ...cleaningData].filter(d => Number(d.pieces) <= Number(d.minPieces) && Number(d.minPieces) > 0);
+    
+    if (!all.length) { container.innerHTML = "Minden készleten!"; return; }
+    all.forEach(i => {
+        container.innerHTML += `
+            <div style="padding:10px; border-bottom:1px solid #374151">
+                <b>${i.name}</b> (${i.pieces} van / ${i.minPieces} kell)
+            </div>`;
     });
 }
 
@@ -355,83 +267,29 @@ function editItem(i) {
     document.getElementById("qty").value = d.qty;
     document.getElementById("unit").value = d.unit;
     document.getElementById("storage").value = d.storage;
-    document.getElementById("expiry").value = d.expiry;
     editIndex = i;
-    document.getElementById("saveBtn").innerText = "Módosítás mentése";
     window.scrollTo(0,0);
 }
 
-function deleteItem(i) { 
-    if(confirm("Törlöd?")) { 
-        if(currentPage==="food") foodData.splice(i,1); else cleaningData.splice(i,1); 
-        save(); render(); 
-    } 
-}
-
-/* CHAT */
-function addNote() {
-    const text = document.getElementById("noteText").value.trim();
-    const user = document.getElementById("userSelect").value;
-    if(!text) return;
-    notesData.unshift({ text, user, time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) });
-    save(); document.getElementById("noteText").value = ""; renderNotes();
-}
-
-function renderNotes() {
-    const nList = document.getElementById("notesList");
-    nList.innerHTML = notesData.map((n, i) => `
-        <div class="bubble ${n.user === document.getElementById("userSelect").value ? 'me' : 'other'}">
-            <small><b>${n.user}</b></small><br>${n.text}
-            <div style="font-size:9px; text-align:right">${n.time} <span class="delete-link" onclick="deleteNote(${i})">x</span></div>
-        </div>`).join("");
-}
-function deleteNote(i) { notesData.splice(i, 1); save(); renderNotes(); }
-
-/* SCANNER */
-let html5QrCode = new Html5Qrcode("reader");
-function startScanner() {
-    html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (text) => {
-        html5QrCode.stop();
-        if (barcodeDatabase[text]) {
-            const item = barcodeDatabase[text];
-            document.getElementById("name").value = item.name;
-            document.getElementById("qty").value = item.qty;
-            document.getElementById("unit").value = item.unit;
-        } else { lastBarcode = text; alert("Új kód!"); }
-    }).catch(err => alert("Hiba a kamerával."));
-}
-
 function clearForm() {
-    document.getElementById("name").value = ""; document.getElementById("pieces").value = "";
-    document.getElementById("minPieces").value = ""; document.getElementById("qty").value = "";
-    document.getElementById("expiry").value = ""; editIndex = null;
+    document.getElementById("name").value = ""; 
+    document.getElementById("pieces").value = "";
+    document.getElementById("imgUrl").value = "";
+    editIndex = null;
 }
 
-function copyShoppingList() {
-    const all = [...foodData, ...cleaningData];
-    const toBuy = all.filter(d => Number(d.pieces) <= Number(d.minPieces) && Number(d.minPieces) > 0);
-    const text = "🛒 LISTA:\n" + toBuy.map(i => `- ${i.name} (${i.minPieces} db)`).join("\n");
-    navigator.clipboard.writeText(text); alert("Másolva!");
+function setCategory(cat) {
+    currentPage = cat;
+    document.getElementById("headerTitle").innerText = cat === 'food' ? "🥦 Élelmiszer" : "🧴 Tisztító";
+    updateStorageOptions();
+    render();
 }
 
-function exportData() {
-    const blob = new Blob([JSON.stringify({ food: foodData, cleaning: cleaningData, notes: notesData, barcodes: barcodeDatabase })], { type: "application/json" });
-    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "backup.json"; a.click();
+function updateStorageOptions() {
+    const s = document.getElementById("storage");
+    s.innerHTML = "";
+    storageOptions[currentPage].forEach(opt => s.innerHTML += `<option value="${opt}">${opt}</option>`);
 }
-
-function importData() {
-    const file = document.getElementById("importFile").files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        const data = JSON.parse(e.target.result);
-        foodData = data.food; cleaningData = data.cleaning; notesData = data.notes; barcodeDatabase = data.barcodes;
-        save(); render(); alert("Kész!");
-    };
-    reader.readAsText(file);
-}
-
-function clearAllData() { if(confirm("Törölsz MINDENT?")) { localStorage.clear(); location.reload(); } }
 
 updateStorageOptions();
 render();
